@@ -1,4 +1,4 @@
-﻿namespace RockSatC_2016.Utility {
+﻿namespace DemoSat2016Netduino_OnboardSD.Utility {
     public struct Vector {
         public float X { get; set; } 
         public float Y { get; set; } 

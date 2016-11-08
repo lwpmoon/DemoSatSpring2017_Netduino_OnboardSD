@@ -1,11 +1,9 @@
-﻿using System.Threading;
+﻿using DemoSat2016Netduino_OnboardSD.Drivers;
+using DemoSat2016Netduino_OnboardSD.Flight_Computer;
+using DemoSat2016Netduino_OnboardSD.Work_Items;
 using Microsoft.SPOT;
-using RockSatC_2016.Drivers;
-using RockSatC_2016.Flight_Computer;
-using RockSatC_2016.Work_Items;
 
-
-namespace RockSatC_2016 {
+namespace DemoSat2016Netduino_OnboardSD {
     
     
     //debug packets instead of usb debug
@@ -29,22 +27,14 @@ namespace RockSatC_2016 {
             var timeSync = new TimeSync(delay:10000);
             timeSync.Run();
 
-            //Initializes the RICH on pin D7
-            Rebug.Print("Initializing RICH detector");
-            var rich = new Rich();
-
             //THIS SECTION CREATES/INITIALIZES THE SERIAL BNO 100HZ UPDATER
             Rebug.Print("Initializing BNO Sensor ");
             var bnoloop = new SerialBnoUpdater(delay:1000);
 
-            //THIS SECTION CREATES/INITIALIZES THE GEIGER COUNTER UPDATER
-            Rebug.Print("Initializing geiger counter collection data");
-            var geigerloop = new GeigerUpdater(delay:10, size:2048);
-
-            //THIS SECTION CREATES/INITIALIZES THE GEIGER COUNTER UPDATER
-            var accel_dump_size = 18432;
-            Rebug.Print("Initializing fast accel dump collector with a size of " + accel_dump_size + "bytes.");
-            var acceldumploop = new AccelUpdater(accel_dump_size);
+            ////THIS SECTION CREATES/INITIALIZES THE MAGNETOMETER UPDATER
+            var mag_dump_size = 18432;
+            Rebug.Print("Initializing fast mag dump collector with a size of " + mag_dump_size + "bytes.");
+            var magDumpLoop = new CustomMagUpdater(mag_dump_size);
 
             //Thread.Sleep(5000);
             Rebug.Print("Flight computer INIT Complete. Continuing with boot.");
@@ -53,25 +43,22 @@ namespace RockSatC_2016 {
             Rebug.Print("Starting memory monitor...");
             MemoryMonitor.Instance.Start(ref logger);
 
-            //THIS STARTS THE Accel dump update
+            ////THIS STARTS THE Mag dump update
             Rebug.Print("Starting accel dumper...");
-            acceldumploop.Start();
+            magDumpLoop.Start();
 
             //THIS STARTS THE BNO SENSOR UPDATE
             Rebug.Print("Starting bno sensor updates...");
             bnoloop.Start();
 
-            //THIS STARTS THE Geiger UPDATE.
-            Rebug.Print("Starting geiger counter data collection...");
-            geigerloop.Start();
-
-            //Starts the RICH detector
-            Rebug.Print("Starting RICH detector");
-            rich.TurnOn();
-
             Rebug.Print("Flight computer boot successful.");
         }
-
+        public static void custom_delay_usec(int microseconds)
+        {
+            long delayTime = microseconds * 10;
+            long delayStart = Microsoft.SPOT.Hardware.Utility.GetMachineTime().Ticks;
+            while ((Microsoft.SPOT.Hardware.Utility.GetMachineTime().Ticks - delayStart) < delayTime) ;
+        }
     }
 }
 

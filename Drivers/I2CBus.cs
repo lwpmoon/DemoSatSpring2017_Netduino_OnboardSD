@@ -1,7 +1,7 @@
 using System;
 using Microsoft.SPOT.Hardware;
 
-namespace RockSatC_2016.Drivers
+namespace DemoSat2016Netduino_OnboardSD.Drivers
 {
     public class I2CBus : IDisposable
     {

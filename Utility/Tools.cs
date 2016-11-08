@@ -1,6 +1,6 @@
 using System;
 
-namespace RockSatC_2016.Utility
+namespace DemoSat2016Netduino_OnboardSD.Utility
 {
     internal static class Tools
     {

@@ -1,10 +1,9 @@
 using System.Threading;
-using Microsoft.SPOT;
+using DemoSat2016Netduino_OnboardSD.Work_Items;
 using Microsoft.SPOT.Hardware;
-using RockSatC_2016.Work_Items;
 using SecretLabs.NETMF.Hardware.Netduino;
 
-namespace RockSatC_2016.Drivers
+namespace DemoSat2016Netduino_OnboardSD.Drivers
 {
     public class Rich
     {

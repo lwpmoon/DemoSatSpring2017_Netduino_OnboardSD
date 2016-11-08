@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RockSatC_2016.Utility {
+namespace DemoSat2016Netduino_OnboardSD.Utility {
     public class Quaternion {
         public double W { get; set; }
         public double X { get; set; }

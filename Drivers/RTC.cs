@@ -1,10 +1,10 @@
+using DemoSat2016Netduino_OnboardSD.Flight_Computer;
+using DemoSat2016Netduino_OnboardSD.Utility;
+using DemoSat2016Netduino_OnboardSD.Work_Items;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
-using RockSatC_2016.Flight_Computer;
-using RockSatC_2016.Utility;
-using RockSatC_2016.Work_Items;
 
-namespace RockSatC_2016.Drivers
+namespace DemoSat2016Netduino_OnboardSD.Drivers
 {
     // ReSharper disable once InconsistentNaming
     internal static class RTC

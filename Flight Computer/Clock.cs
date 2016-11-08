@@ -1,6 +1,6 @@
 using System;
 
-namespace RockSatC_2016.Flight_Computer
+namespace DemoSat2016Netduino_OnboardSD.Flight_Computer
 {
     internal class Clock
     {

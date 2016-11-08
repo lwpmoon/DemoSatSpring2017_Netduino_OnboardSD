@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading;
-using Microsoft.SPOT;
-using RockSatC_2016.Drivers;
-using RockSatC_2016.Flight_Computer;
+using DemoSat2016Netduino_OnboardSD.Drivers;
+using DemoSat2016Netduino_OnboardSD.Flight_Computer;
 using SecretLabs.NETMF.Hardware.Netduino;
 
-namespace RockSatC_2016.Work_Items {
+namespace DemoSat2016Netduino_OnboardSD.Work_Items {
     public class SerialBnoUpdater {
 
         private readonly SerialBno _bnoSensor;
@@ -19,7 +18,6 @@ namespace RockSatC_2016.Work_Items {
         private readonly int _timeDataCount = 3; //1 8 byte time stamp
         private readonly int _precision;
         private readonly int _delay;
-        private long _timeSinceLastRun;
 
         public SerialBnoUpdater(int sigFigs = 4, int delay = 30000) {
 
@@ -50,6 +48,7 @@ namespace RockSatC_2016.Work_Items {
             _dataArray[dataIndex++] = time[2];
             
             var accelVec = _bnoSensor.read_vector(SerialBno.Bno055VectorType.VectorAccelerometer);
+            var gravVec = _bnoSensor.read_vector(SerialBno.Bno055VectorType.VectorGravity);
             
             accelVec.X *= 100;
             accelVec.Y *= 100;

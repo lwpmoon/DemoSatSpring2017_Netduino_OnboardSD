@@ -1,7 +1,7 @@
 using System.Threading;
-using RockSatC_2016.Flight_Computer;
+using DemoSat2016Netduino_OnboardSD.Flight_Computer;
 
-namespace RockSatC_2016.Work_Items
+namespace DemoSat2016Netduino_OnboardSD.Work_Items
 {
     public class WorkItem
     {

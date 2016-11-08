@@ -1,9 +1,9 @@
 using System;
 using System.Threading;
-using RockSatC_2016.Drivers;
-using RockSatC_2016.Work_Items;
+using DemoSat2016Netduino_OnboardSD.Drivers;
+using DemoSat2016Netduino_OnboardSD.Work_Items;
 
-namespace RockSatC_2016.Flight_Computer
+namespace DemoSat2016Netduino_OnboardSD.Flight_Computer
 {
     public class TimeSync
     {

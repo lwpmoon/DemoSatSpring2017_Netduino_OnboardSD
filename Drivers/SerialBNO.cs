@@ -2,11 +2,10 @@
 using System.IO.Ports;
 using System.Text;
 using System.Threading;
-using Microsoft.SPOT;
-using RockSatC_2016.Utility;
-using RockSatC_2016.Work_Items;
+using DemoSat2016Netduino_OnboardSD.Utility;
+using DemoSat2016Netduino_OnboardSD.Work_Items;
 
-namespace RockSatC_2016.Drivers {
+namespace DemoSat2016Netduino_OnboardSD.Drivers {
     
     public class SerialBno {
 

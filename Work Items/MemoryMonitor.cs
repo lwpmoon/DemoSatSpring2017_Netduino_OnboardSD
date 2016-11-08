@@ -1,9 +1,8 @@
 using System.Collections;
-using System.Threading;
+using DemoSat2016Netduino_OnboardSD.Flight_Computer;
 using Microsoft.SPOT;
-using RockSatC_2016.Flight_Computer;
 
-namespace RockSatC_2016.Work_Items
+namespace DemoSat2016Netduino_OnboardSD.Work_Items
 {
     public class MemoryMonitor 
     {
