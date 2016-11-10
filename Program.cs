@@ -8,10 +8,14 @@ namespace DemoSat2016Netduino_OnboardSD {
     
     //debug packets instead of usb debug
     
-    public static class Program {
-       
+    public static class Program
+    {
+        public static LiquidCrystalI2C Lcd = new LiquidCrystalI2C(0,16,2);
+        
         public static void Main() {
 
+            Lcd.write("Testing!");
+            
             //THIS SECTION CREATES / INITIALIZES THE SERIAL LOGGER
             Debug.Print("Flight computer started successfully. Beginning INIT.");
 
@@ -49,7 +53,7 @@ namespace DemoSat2016Netduino_OnboardSD {
             MemoryMonitor.Instance.Start(ref logger);
 
             ////THIS STARTS THE Mag dump update
-            Rebug.Print("Starting accel dumper...");
+            Rebug.Print("Starting fast mag dump...");
             magDumpLoop.Start();
 
             //THIS STARTS THE BNO SENSOR UPDATE
