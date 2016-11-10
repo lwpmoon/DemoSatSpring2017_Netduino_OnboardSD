@@ -1,15 +1,15 @@
-﻿namespace DemoSat2016Netduino_OnboardSD.Utility {
+﻿using System.Collections;
+
+namespace DemoSat2016Netduino_OnboardSD.Utility {
     public struct Vector {
-        public float X { get; set; } 
-        public float Y { get; set; } 
-        public float Z { get; set; }
-        //public Vector() {
-        //    X = 0;
-        //    Y = 0;
-        //    Z = 0;
-        //}
+
+        public float[] InnerArray { get; private set; }
+        public float X { get { return InnerArray[0]; } set { InnerArray[0] = value; } } 
+        public float Y { get { return InnerArray[1]; } set { InnerArray[0] = value; } } 
+        public float Z { get { return InnerArray[2]; } set { InnerArray[0] = value; } } 
 
         public Vector(float x, float y, float z) {
+            InnerArray = new float[3];
             X = x;
             Y = y;
             Z = z;

@@ -1,5 +1,6 @@
 ﻿#undef BMP085_USE_DATASHEET_VALS
 using System;
+using DemoSat2016Netduino_OnboardSD.Utility;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 using Math = System.Math;
@@ -229,6 +230,10 @@ namespace DemoSat2016Netduino_OnboardSD.Drivers
             return ((x1 + x2 + 8) / Math.Pow(2, 4)) / 10;
         }
 
+        public double GetCurrentAltitude() {
+            var test = GetPressure();
+            return PressureToAltitude(SensorsPressureSealevelhpa, GetPressure(), GetTemperature());
+        }
         public static double PressureToAltitude(double seaLevel, double atmospheric, double temp)
         {
             /* Hyposometric formula:                      */

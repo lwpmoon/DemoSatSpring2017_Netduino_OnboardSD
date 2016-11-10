@@ -31,6 +31,11 @@ namespace DemoSat2016Netduino_OnboardSD {
             Rebug.Print("Initializing BNO Sensor ");
             var bnoloop = new SerialBnoUpdater(delay:1000);
 
+
+            //THIS SECTION CREATES/INITIALIZES THE SERIAL BNO 100HZ UPDATER
+            Rebug.Print("Initializing BMP Sensor ");
+            var bmploop = new PressureTempAltitudeUpdater(delay:1000);
+
             ////THIS SECTION CREATES/INITIALIZES THE MAGNETOMETER UPDATER
             var mag_dump_size = 18432;
             Rebug.Print("Initializing fast mag dump collector with a size of " + mag_dump_size + "bytes.");
@@ -50,6 +55,10 @@ namespace DemoSat2016Netduino_OnboardSD {
             //THIS STARTS THE BNO SENSOR UPDATE
             Rebug.Print("Starting bno sensor updates...");
             bnoloop.Start();
+
+            //THIS STARTS THE BNO SENSOR UPDATE
+            Rebug.Print("Starting bmp sensor updates...");
+            bmploop.Start();
 
             Rebug.Print("Flight computer boot successful.");
         }

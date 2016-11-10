@@ -47,7 +47,15 @@ namespace DemoSat2016Netduino_OnboardSD.Drivers {
 
             return true;
         }
-
+        public byte[] GetCalibration() {
+            var calib = new byte[4];
+            var calData = read_byte(Bno055Registers.Bno055CalibStatAddr);
+            calib[0] = (byte)((calData >> 6) & 0x03);
+            calib[1] = (byte)((calData >> 4) & 0x03);
+            calib[1] = (byte)((calData >> 2) & 0x03);
+            calib[1] = (byte)(calData & 0x03);
+            return calib;
+        }
         public Vector read_vector(Bno055VectorType vec, int count = 3) {
             var data = read_bytes((Bno055Registers)vec, count*2);
             var rawResult = new int[count];

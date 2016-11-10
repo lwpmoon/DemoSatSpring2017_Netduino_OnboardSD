@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Threading;
 using DemoSat2016Netduino_OnboardSD.Drivers;
 using DemoSat2016Netduino_OnboardSD.Flight_Computer;
+using DemoSat2016Netduino_OnboardSD.Utility;
 using SecretLabs.NETMF.Hardware.Netduino;
 
 namespace DemoSat2016Netduino_OnboardSD.Work_Items {
@@ -13,13 +15,13 @@ namespace DemoSat2016Netduino_OnboardSD.Work_Items {
 
         private readonly WorkItem _workItem;
         private readonly byte[] _dataArray;
-        private readonly int _dataCount = 9; //3 points of data, 2 bytes each
+        private readonly int _dataCount = 58; //6*3*3(6vectors*3axis*3bytes/axis + 4(calib)
         private readonly int _metaDataCount = 2; //2 size, 1 start byte, 1 type byte
         private readonly int _timeDataCount = 3; //1 8 byte time stamp
         private readonly int _precision;
         private readonly int _delay;
 
-        public SerialBnoUpdater(int sigFigs = 4, int delay = 30000) {
+        public SerialBnoUpdater(int sigFigs = 3, int delay = 30000) {
 
 
             _bnoSensor = new SerialBno(SerialPorts.COM3,5000,5000,SerialBno.Bno055OpMode.OperationModeNdof);
@@ -49,30 +51,29 @@ namespace DemoSat2016Netduino_OnboardSD.Work_Items {
             
             var accelVec = _bnoSensor.read_vector(SerialBno.Bno055VectorType.VectorAccelerometer);
             var gravVec = _bnoSensor.read_vector(SerialBno.Bno055VectorType.VectorGravity);
-            
-            accelVec.X *= 100;
-            accelVec.Y *= 100;
-            accelVec.Z *= 100;
+            var gyroVec = _bnoSensor.read_vector(SerialBno.Bno055VectorType.VectorGyroscope);
+            var linAccVec = _bnoSensor.read_vector(SerialBno.Bno055VectorType.VectorLinearaccel);
+            var eulerVec = _bnoSensor.read_vector(SerialBno.Bno055VectorType.VectorEuler);
+            var magVec = _bnoSensor.read_vector(SerialBno.Bno055VectorType.VectorMagnetometer);
 
-            _dataArray[dataIndex++] = (accelVec.X < 0 ? (byte) 1 : (byte) 0);
-            accelVec.X = (float) System.Math.Abs(accelVec.X);
-
-            _dataArray[dataIndex++] = (byte)(((short)accelVec.X >> 8) & 0xFF);
-            _dataArray[dataIndex++] = (byte)((short)accelVec.X & 0xFF);
-
-
-            _dataArray[dataIndex++] = (accelVec.Y < 0 ? (byte)1 : (byte)0);
-            accelVec.Y = (float)System.Math.Abs(accelVec.Y);
-
-            _dataArray[dataIndex++] = (byte)(((short)accelVec.Y >> 8) & 0xFF);
-            _dataArray[dataIndex++] = (byte)((short)accelVec.Y & 0xFF);
-
-            _dataArray[dataIndex++] = (accelVec.Z < 0 ? (byte)1 : (byte)0);
-            accelVec.Z = (float)System.Math.Abs(accelVec.Z);
-
-            _dataArray[dataIndex++] = (byte)(((short)accelVec.Z >> 8) & 0xFF);
-            _dataArray[dataIndex] = (byte)((short)accelVec.Z & 0xFF);
-
+            //3 bytes each component, 3 components each vector, 6 vectors 
+            //= 54 bytes + 3 bytes for time + 2 bytes for metadata + 
+            //4 bytes calib = 63 bytes per update, 58 bytes of sensor data (54 + 4)
+            var test = new ArrayList {accelVec, gravVec, linAccVec, gyroVec, magVec, eulerVec};
+            foreach (Vector vector in test) {
+                for(var i = 0; i < 3; i++) {
+                    var component = vector.InnerArray[i] * _precision;
+                    _dataArray[dataIndex++] = (component < 0 ? (byte) 1 : (byte) 0);
+                    component = (float) Math.Abs(component);
+                    _dataArray[dataIndex++] = (byte)(((short)component >> 8) & 0xFF);
+                    _dataArray[dataIndex++] = (byte)((short)component & 0xFF);
+                }
+            }
+            var calib = _bnoSensor.GetCalibration();
+            _dataArray[dataIndex++] = calib[0];
+            _dataArray[dataIndex++] = calib[1];
+            _dataArray[dataIndex++] = calib[2];
+            _dataArray[dataIndex] = calib[3];
             Array.Copy(_dataArray, _workItem.PacketData, _dataArray.Length);
 
             Thread.Sleep(_delay);
