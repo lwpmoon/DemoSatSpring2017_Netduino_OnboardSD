@@ -23,7 +23,7 @@ namespace DemoSat2016Netduino_OnboardSD.Work_Items
             _workItem = new WorkItem(DumpMagData, ref _dataArray, loggable: true, persistent: true, pauseable: true);
 
             _dataArray[0] = (byte)PacketType.StartByte;
-            _dataArray[1] = (byte)PacketType.MagDump;
+            _dataArray[1] = (byte)PacketType.FMagDump;
         }
 
         private void DumpMagData()
@@ -37,7 +37,7 @@ namespace DemoSat2016Netduino_OnboardSD.Work_Items
 
             for (var i = 0; i < _dataCount / 2; i++)
             {
-                var raw = (short)(_magPin.Read() * 1000);
+                var raw = (short)(_magPin.Read());
                 var msb = (byte)((raw >> 8) & 0xFF);
                 var lsb = (byte)(raw & 0xff);
 

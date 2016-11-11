@@ -63,25 +63,25 @@ namespace DemoSat2016Netduino_OnboardSD {
             //var bmploop = new PressureTempAltitudeUpdater(bus, delay: 1000);
             //LCDFinish(lcd);
 
-            ////THIS SECTION CREATES/INITIALIZES THE SERIAL BNO 100HZ UPDATER
+            //THIS SECTION CREATES/INITIALIZES THE SERIAL BNO 100HZ UPDATER
             lcd.Write("Init BNO sensor...");
             Rebug.Print("Initializing BNO Sensor ");
             var bno = new SerialBno(SerialPorts.COM1, 5000, 5000, SerialBno.Bno055OpMode.OperationModeNdof);
-            var bnoloop = new SerialBnoUpdater(bno, delay:1000);
+            var bnoloop = new SerialBnoUpdater(bno, delay: 1000);
             LCDFinish(lcd, "Done.");
-            
-            //Starts up the expensive mag
+
+            ////Starts up the expensive mag
             lcd.Write("Init exp. mag...");
             Rebug.Print("Initializing expensive magnetometer on com3");
-            var expensiveMagLoop = new ExpensiveMagUpdater(delay:1000);
+            var expensiveMagLoop = new ExpensiveMagUpdater(delay: 1000);
             LCDFinish(lcd, "Done.");
 
             lcd.Write("Init calib disp.");
             Rebug.Print("Initializing BNO calibration display loop");
-            var printBnoCalib = new BNOCalibUpdate(bno,lcd, delay:1000);
+            var printBnoCalib = new BNOCalibUpdate(bno, lcd, delay: 1000);
             LCDFinish(lcd, "Done.");
-            
-            ////THIS SECTION CREATES/INITIALIZES THE MAGNETOMETER UPDATER
+
+            //////THIS SECTION CREATES/INITIALIZES THE MAGNETOMETER UPDATER
             var mag_dump_size = 18432;
             lcd.Write("Init fast mag...");
             Rebug.Print("Initializing fast mag dump collector with a size of " + mag_dump_size + "bytes.");
@@ -98,25 +98,25 @@ namespace DemoSat2016Netduino_OnboardSD {
             Rebug.Print("Starting memory monitor...");
             MemoryMonitor.Instance.Start(ref logger);
             LCDFinish(lcd, "Done.");
-            
+
             ////THIS STARTS THE Mag dump update
             lcd.Write("Start f.mag loop...");
             Rebug.Print("Starting fast mag dump...");
             customMagLoop.Start();
             LCDFinish(lcd, "Done.");
-            
+
             ////THIS STARTS THE BNO SENSOR UPDATE
             lcd.Write("Start bno loop...");
             Rebug.Print("Starting bno sensor updates...");
             bnoloop.Start();
             LCDFinish(lcd, "Done.");
-            
+
             //THIS STARTS THE BNO SENSOR UPDATE
             //lcd.Write("Start bmp loop");
             //Rebug.Print("Starting bmp sensor updates...");
             //bmploop.Start();
             //LCDFinish(lcd);
-            
+
             //THIS STARTS THE EXPENSIVE MAG UPDATE
             lcd.Write("Start e.mag loop...");
             Rebug.Print("Starting expensive mag updates...");

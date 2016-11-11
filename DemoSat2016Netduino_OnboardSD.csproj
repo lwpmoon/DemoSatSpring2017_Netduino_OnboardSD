@@ -35,10 +35,6 @@
     <Compile Include="BNOCalibUpdate.cs" />
     <Compile Include="Drivers\BMP180.cs" />
     <Compile Include="Drivers\ExpensiveMag.cs" />
-    <Compile Include="Drivers\I2CBus.cs" />
-    <Compile Include="Drivers\LCD.cs" />
-    <Compile Include="Drivers\RICH.cs" />
-    <Compile Include="Drivers\RTC.cs" />
     <Compile Include="Drivers\SerialBNO.cs" />
     <Compile Include="Work Items\CustomMagUpdater.cs" />
     <Compile Include="Work Items\ExpensiveMagUpdater.cs" />
@@ -52,7 +48,6 @@
     <Compile Include="Flight Computer\FlightComputer.cs" />
     <Compile Include="Flight Computer\Logger.cs" />
     <Compile Include="Flight Computer\ThreadPool.cs" />
-    <Compile Include="Flight Computer\TimeSync.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\DebuggerBrowsableState.cs" />
     <Compile Include="Utility\Quaternion.cs" />

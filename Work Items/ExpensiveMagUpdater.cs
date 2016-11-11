@@ -21,16 +21,15 @@ namespace DemoSat2016Netduino_OnboardSD.Work_Items {
         public ExpensiveMagUpdater(int delay = 30000) {
 
             _expensiveMag = new ExpensiveMag(SerialPorts.COM3,5000,5000);
+            _expensiveMag.Begin();
 
-            _dataArray = new byte[_dataCount + _metaDataCount + _timeDataCount + _sizeDataCount]; 
+            _dataArray = new byte[_dataCount + _metaDataCount + _timeDataCount + _sizeDataCount];
             _dataArray[0] = (byte)PacketType.StartByte; // start bit = 0xff
-            _dataArray[1] = (byte)PacketType.BnoDump;
+            _dataArray[1] = (byte)PacketType.EMagDump;
 
             _delay = delay;
-            
-            _workItem = new WorkItem(OnTaskExecute, ref _dataArray, loggable:true, persistent:true, pauseable:true);
 
-            _expensiveMag.Begin();
+            _workItem = new WorkItem(OnTaskExecute, ref _dataArray, loggable:true, persistent:true, pauseable:true);
         }
 
         private void OnTaskExecute() {

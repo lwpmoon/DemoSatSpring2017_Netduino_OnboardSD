@@ -80,29 +80,30 @@ namespace DemoSat2016Netduino_OnboardSD.Drivers {
         }
 
         private byte[] serial_send(byte[] command, int expectedLength, bool ack = true, int maxTries = 10, int tries = 0) {
+            lock (Locker) {
+                _comPort.Flush();
+                _comPort.Write(command, 0, command.Length);
 
-            _comPort.Flush();
-            _comPort.Write(command, 0, command.Length);
-            
-            //If no ack needed, we're done.
-            if (!ack) return null;
-            
-            //wait for serial stream to fill with expected ack data
-            Thread.Sleep(500); //bug THIS THIS SLOW... should wait until correct amount of data is ready to be read.
-            
-            var response = new byte[_comPort.BytesToRead];
-            var readCount = _comPort.Read(response, 0, response.Length);
-            //If we timed out, throw an exception.
-            if (readCount == 0) Rebug.Print("Serial ACK timeout...");
+                //If no ack needed, we're done.
+                if (!ack) return null;
 
-            //if we didn't get an error code (0xEE07), we're done.
-            if (response.Length > 0 && !(response[0] == 0xEE && response[1] == 0x07)) return response;
-            //if we tried 5 times to get a non-error ACK and didn't, throw an exception.
-            if (++tries == maxTries)
-                throw new IOException("Exceeded max tries to acknowlege serial command without bus error.");
+                //wait for serial stream to fill with expected ack data
+                Thread.Sleep(500); //bug THIS THIS SLOW... should wait until correct amount of data is ready to be read.
+
+                var response = new byte[_comPort.BytesToRead];
+                var readCount = _comPort.Read(response, 0, response.Length);
+                //If we timed out, throw an exception.
+                if (readCount == 0) Rebug.Print("Serial ACK timeout...");
+
+                //if we didn't get an error code (0xEE07), we're done.
+                if (response.Length > 0 && !(response[0] == 0xEE && response[1] == 0x07)) return response;
+                //if we tried 5 times to get a non-error ACK and didn't, throw an exception.
+                if (++tries == maxTries)
+                    throw new IOException("Exceeded max tries to acknowlege serial command without bus error.");
 
 
-            return serial_send(command, expectedLength, maxTries:maxTries, tries:tries);
+                return serial_send(command, expectedLength, maxTries: maxTries, tries: tries);
+            }
         }
 
         private void write_byte(Bno055Registers reg, byte data, bool ack = true) {
@@ -157,6 +158,7 @@ namespace DemoSat2016Netduino_OnboardSD.Drivers {
             command[3] = (byte)expectedLength; //Length
 
             //send read command and get ack
+
             var response = serial_send(command, expectedLength, ack);
 
             if (response[0] != 0xBB) throw new IOException("Serial Read error: 0x" + Bytearraytostring(response));

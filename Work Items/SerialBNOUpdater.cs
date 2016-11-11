@@ -17,7 +17,7 @@ namespace DemoSat2016Netduino_OnboardSD.Work_Items {
         private readonly byte[] _dataArray;
         private readonly int _dataCount = 58; //6*3*3(6vectors*3axis*3bytes/axis + 4(calib)
         private readonly int _metaDataCount = 2; //2 size, 1 start byte, 1 type byte
-        private readonly int _timeDataCount = 3; //1 8 byte time stamp
+        private readonly int _timeDataCount = 3; //1 3 byte time stamp
         private readonly int _precision;
         private readonly int _delay;
 

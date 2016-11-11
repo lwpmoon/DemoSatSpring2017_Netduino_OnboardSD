@@ -3,6 +3,7 @@ using DemoSat2016Netduino_OnboardSD.Drivers;
 using DemoSat2016Netduino_OnboardSD.Flight_Computer;
 using DemoSat2016Netduino_OnboardSD.Work_Items;
 using MicroLiquidCrystal;
+using Microsoft.SPOT;
 
 namespace DemoSat2016Netduino_OnboardSD {
     public class BNOCalibUpdate {
