@@ -4,9 +4,9 @@ using System.Text;
 using System.Threading;
 using DemoSat2016Netduino_OnboardSD.Utility;
 using DemoSat2016Netduino_OnboardSD.Work_Items;
+using Microsoft.SPOT;
 
 namespace DemoSat2016Netduino_OnboardSD.Drivers {
-    
     public class SerialBno {
 
         public SerialBno(string comPort, int readTimeout, int writeTimeout, Bno055OpMode mode = Bno055OpMode.OperationModeAccgyro) {
@@ -50,10 +50,10 @@ namespace DemoSat2016Netduino_OnboardSD.Drivers {
         public byte[] GetCalibration() {
             var calib = new byte[4];
             var calData = read_byte(Bno055Registers.Bno055CalibStatAddr);
-            calib[0] = (byte)((calData >> 6) & 0x03);
-            calib[1] = (byte)((calData >> 4) & 0x03);
-            calib[1] = (byte)((calData >> 2) & 0x03);
-            calib[1] = (byte)(calData & 0x03);
+            calib[0] = (byte)((calData >> 6) & 0x03); //sys
+            calib[1] = (byte)((calData >> 4) & 0x03); //gyr
+            calib[1] = (byte)((calData >> 2) & 0x03); //acc
+            calib[1] = (byte)(calData & 0x03); //mag
             return calib;
         }
         public Vector read_vector(Bno055VectorType vec, int count = 3) {
@@ -74,12 +74,8 @@ namespace DemoSat2016Netduino_OnboardSD.Drivers {
                     modifier = 900.0f;
                     break;
             }
-            return new Vector()
-            {
-                X = rawResult[0] / modifier,
-                Y = rawResult[1] / modifier,
-                Z = rawResult[2] / modifier
-            };
+            return new Vector(rawResult[0]/modifier, rawResult[1]/modifier, rawResult[2]/modifier);
+
 
         }
 

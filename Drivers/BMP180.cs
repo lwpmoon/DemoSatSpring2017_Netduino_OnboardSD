@@ -1,6 +1,7 @@
 ﻿#undef BMP085_USE_DATASHEET_VALS
 using System;
 using DemoSat2016Netduino_OnboardSD.Utility;
+using FusionWare.SPOT.Hardware;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 using Math = System.Math;
@@ -34,8 +35,8 @@ namespace DemoSat2016Netduino_OnboardSD.Drivers
             Bmp085_Register_Readpressurecmd = 0x34
         }
 
-        public Bmp180(byte address = 0x77, Mode mode = Mode.Bmp085_Mode_Ultralowpower)
-        {
+        public Bmp180(I2CBus bus, byte address = 0x77, Mode mode = Mode.Bmp085_Mode_Ultralowpower) {
+            _bus = bus;
             Bmp085Address = address;
             _slaveConfig = new I2CDevice.Configuration(Bmp085Address, 100);
             while (!Init(mode))
@@ -74,6 +75,7 @@ namespace DemoSat2016Netduino_OnboardSD.Drivers
         Bmp085CalibData _bmp085Coeffs;
 
         private readonly I2CDevice.Configuration _slaveConfig;
+        private I2CBus _bus;
         private const int TransactionTimeout = 1000; // ms
 
         public bool Init(Mode mode = Mode.Bmp085_Mode_Standard)
@@ -86,7 +88,8 @@ namespace DemoSat2016Netduino_OnboardSD.Drivers
 
             byte[] whoami = { 0 };
 
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Chipid, whoami, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig,new[] {(byte)Registers.Bmp085_Register_Chipid}, whoami, TransactionTimeout);
+            //I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Chipid, whoami, TransactionTimeout);
 
             if (whoami[0] != 0x55) return false;
 
@@ -100,58 +103,72 @@ namespace DemoSat2016Netduino_OnboardSD.Drivers
 
             var buffer = new byte[2];
 
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Ac1, buffer, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new[] { (byte)Registers.Bmp085_Register_Cal_Ac1 }, buffer, TransactionTimeout);
+            //I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Ac1, buffer, TransactionTimeout);
             _bmp085Coeffs.Ac1 = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Ac2, buffer, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new[] { (byte)Registers.Bmp085_Register_Cal_Ac2 }, buffer, TransactionTimeout);
+            //I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Ac2, buffer, TransactionTimeout);
             _bmp085Coeffs.Ac2 = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Ac3, buffer, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new[] { (byte)Registers.Bmp085_Register_Cal_Ac3 }, buffer, TransactionTimeout);
+            //I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Ac3, buffer, TransactionTimeout);
             _bmp085Coeffs.Ac3 = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Ac4, buffer, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new[] { (byte)Registers.Bmp085_Register_Cal_Ac4 }, buffer, TransactionTimeout);
+            //I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Ac4, buffer, TransactionTimeout);
             _bmp085Coeffs.Ac4 = (ushort)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Ac5, buffer, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new[] { (byte)Registers.Bmp085_Register_Cal_Ac5 }, buffer, TransactionTimeout);
+            //I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Ac5, buffer, TransactionTimeout);
             _bmp085Coeffs.Ac5 = (ushort)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Ac6, buffer, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new[] { (byte)Registers.Bmp085_Register_Cal_Ac6 }, buffer, TransactionTimeout);
+            //I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Ac6, buffer, TransactionTimeout);
             _bmp085Coeffs.Ac6 = (ushort)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_B1, buffer, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new[] { (byte)Registers.Bmp085_Register_Cal_B1 }, buffer, TransactionTimeout);
+            //I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_B1, buffer, TransactionTimeout);
             _bmp085Coeffs.B1 = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_B2, buffer, TransactionTimeout);
+
+            _bus.WriteRead(_slaveConfig, new[] { (byte)Registers.Bmp085_Register_Cal_B2 }, buffer, TransactionTimeout);
+            //I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_B2, buffer, TransactionTimeout);
             _bmp085Coeffs.B2 = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Mb, buffer, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new[] { (byte)Registers.Bmp085_Register_Cal_Mb }, buffer, TransactionTimeout);
+            //I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Mb, buffer, TransactionTimeout);
             _bmp085Coeffs.Mb = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Mc, buffer, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new[] { (byte)Registers.Bmp085_Register_Cal_Mc }, buffer, TransactionTimeout);
+            //I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Mc, buffer, TransactionTimeout);
             _bmp085Coeffs.Mc = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Md, buffer, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new[] { (byte)Registers.Bmp085_Register_Cal_Md }, buffer, TransactionTimeout);
+            //I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Cal_Md, buffer, TransactionTimeout);
             _bmp085Coeffs.Md = (short)((buffer[0] << 8) | buffer[1]);
 
         }
 
         ushort ReadRawTemperature()
         {
-
-            I2CBus.GetInstance().WriteRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Control, (byte)Registers.Bmp085_Register_Readtempcmd, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new[] { (byte)Registers.Bmp085_Register_Control}, new [] { (byte)Registers.Bmp085_Register_Readtempcmd }, TransactionTimeout);
+            //I2CBus.GetInstance().WriteRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Control, (byte)Registers.Bmp085_Register_Readtempcmd, TransactionTimeout);
 
             Program.custom_delay_usec(4500);
             //Thread.Sleep(5);
 
             var buffer = new byte[2];
 
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Tempdata, buffer, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new []{(byte)Registers.Bmp085_Register_Tempdata}, buffer, TransactionTimeout);
+            //I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Tempdata, buffer, TransactionTimeout);
             return (ushort)((buffer[0] << 8) | buffer[1]);
         }
 
         int ReadRawPressure()
         {
-            I2CBus.GetInstance().WriteRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Control, (byte)((byte)Registers.Bmp085_Register_Readpressurecmd + ((byte)_mode << 6)), TransactionTimeout);
+            //I2CBus.GetInstance().WriteRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Control, (byte)((byte)Registers.Bmp085_Register_Readpressurecmd + ((byte)_mode << 6)), TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new [] {(byte)Registers.Bmp085_Register_Control}, new [] {(byte)((byte)Registers.Bmp085_Register_Readpressurecmd + ((byte)_mode << 6))}, TransactionTimeout);
 
             switch (_mode)
             {
@@ -176,12 +193,12 @@ namespace DemoSat2016Netduino_OnboardSD.Drivers
             }
 
             var buffer16 = new byte[2];
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Pressuredata, buffer16, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new[] { (byte)Registers.Bmp085_Register_Pressuredata}, buffer16, TransactionTimeout);
 
             var p32 = (ushort)(buffer16[1] | (buffer16[0] << 8)) << 8;
 
             var buffer8 = new byte[1];
-            I2CBus.GetInstance().ReadRegister(_slaveConfig, (byte)Registers.Bmp085_Register_Pressuredata + 2, buffer8, TransactionTimeout);
+            _bus.WriteRead(_slaveConfig, new[] { (byte)(Registers.Bmp085_Register_Pressuredata + 2)}, buffer8, TransactionTimeout);
 
             p32 += buffer8[0];
             p32 >>= (8 - (byte)_mode);

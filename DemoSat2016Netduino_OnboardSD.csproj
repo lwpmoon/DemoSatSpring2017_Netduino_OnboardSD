@@ -32,19 +32,22 @@
   </PropertyGroup>
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <ItemGroup>
+    <Compile Include="BNOCalibUpdate.cs" />
     <Compile Include="Drivers\BMP180.cs" />
+    <Compile Include="Drivers\ExpensiveMag.cs" />
     <Compile Include="Drivers\I2CBus.cs" />
-    <Compile Include="Drivers\LiquidCrystalI2C.cs" />
+    <Compile Include="Drivers\LCD.cs" />
     <Compile Include="Drivers\RICH.cs" />
     <Compile Include="Drivers\RTC.cs" />
     <Compile Include="Drivers\SerialBNO.cs" />
     <Compile Include="Work Items\CustomMagUpdater.cs" />
+    <Compile Include="Work Items\ExpensiveMagUpdater.cs" />
     <Compile Include="Work Items\MemoryMonitor.cs" />
     <Compile Include="Utility\PacketType.cs" />
     <Compile Include="Work Items\PressureTempAltitudeUpdater.cs" />
     <Compile Include="Work Items\Rebug.cs" />
     <Compile Include="Work Items\SerialBNOUpdater.cs" />
-    <Compile Include="Work Items\WorkItem.cs" />
+    <Compile Include="Utility\WorkItem.cs" />
     <Compile Include="Flight Computer\Clock.cs" />
     <Compile Include="Flight Computer\FlightComputer.cs" />
     <Compile Include="Flight Computer\Logger.cs" />
@@ -65,10 +68,16 @@
     <Reference Include="Microsoft.SPOT.Net" />
     <Reference Include="SecretLabs.NETMF.Hardware" />
     <Reference Include="SecretLabs.NETMF.Hardware.Netduino" />
+    <Reference Include="SecretLabs.NETMF.Hardware.NetduinoPlus, Version=4.3.1.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="SecretLabs.NETMF.IO, Version=4.3.1.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="GoBus" />
     <Reference Include="System.IO" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\david\Desktop\Source\MicroLiquidCrystal\MicroLiquidCrystal.csproj">
+      <Project>{B4B72543-E638-44F1-B096-9BBB6BD4698B}</Project>
+      <Name>MicroLiquidCrystal</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

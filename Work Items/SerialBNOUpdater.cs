@@ -4,7 +4,7 @@ using System.Threading;
 using DemoSat2016Netduino_OnboardSD.Drivers;
 using DemoSat2016Netduino_OnboardSD.Flight_Computer;
 using DemoSat2016Netduino_OnboardSD.Utility;
-using SecretLabs.NETMF.Hardware.Netduino;
+using Math = System.Math;
 
 namespace DemoSat2016Netduino_OnboardSD.Work_Items {
     public class SerialBnoUpdater {
@@ -13,7 +13,7 @@ namespace DemoSat2016Netduino_OnboardSD.Work_Items {
 
         //private BNOData _bnoData;
 
-        private readonly WorkItem _workItem;
+        public readonly WorkItem _workItem;
         private readonly byte[] _dataArray;
         private readonly int _dataCount = 58; //6*3*3(6vectors*3axis*3bytes/axis + 4(calib)
         private readonly int _metaDataCount = 2; //2 size, 1 start byte, 1 type byte
@@ -21,10 +21,10 @@ namespace DemoSat2016Netduino_OnboardSD.Work_Items {
         private readonly int _precision;
         private readonly int _delay;
 
-        public SerialBnoUpdater(int sigFigs = 3, int delay = 30000) {
+        public SerialBnoUpdater(SerialBno bno, int sigFigs = 3, int delay = 30000) {
 
 
-            _bnoSensor = new SerialBno(SerialPorts.COM3,5000,5000,SerialBno.Bno055OpMode.OperationModeNdof);
+            _bnoSensor = bno;
 
             _dataArray = new byte[_dataCount + _metaDataCount + _timeDataCount]; 
             _dataArray[0] = (byte)PacketType.StartByte; // start bit = 0xff
@@ -33,12 +33,12 @@ namespace DemoSat2016Netduino_OnboardSD.Work_Items {
             _delay = delay;
             _precision = (int)System.Math.Pow(10, sigFigs - 1);
             
-            _workItem = new WorkItem(BnoUpdater, ref _dataArray, loggable:true, persistent:true, pauseable:true);
+            _workItem = new WorkItem(OnTaskExecute, ref _dataArray, loggable:true, persistent:true, pauseable:true);
 
             _bnoSensor.Begin();
         }
 
-        private void BnoUpdater()
+        private void OnTaskExecute()
         {
             
             var dataIndex = _metaDataCount;

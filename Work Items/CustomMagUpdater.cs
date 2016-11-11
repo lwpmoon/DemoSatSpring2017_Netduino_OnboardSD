@@ -1,13 +1,11 @@
 ﻿using System;
 using DemoSat2016Netduino_OnboardSD.Flight_Computer;
 using Microsoft.SPOT.Hardware;
-using SecretLabs.NETMF.Hardware.Netduino;
 
 namespace DemoSat2016Netduino_OnboardSD.Work_Items
 {
-    public class CustomMagUpdater
-    {
-        private static readonly AnalogInput MagPin = new AnalogInput(AnalogChannels.ANALOG_PIN_A1);
+    public class CustomMagUpdater {
+        private static AnalogInput _magPin;
 
         private readonly WorkItem _workItem;
         private readonly byte[] _dataArray;
@@ -16,8 +14,9 @@ namespace DemoSat2016Netduino_OnboardSD.Work_Items
         private const int MetaDataCount = 2;
         private const int TimeDataCount = 6;
 
-        public CustomMagUpdater(int dataCount)
+        public CustomMagUpdater(int dataCount, Cpu.AnalogChannel magPin)
         {
+            _magPin = new AnalogInput(magPin);
             _dataCount = dataCount;
             Rebug.Print("Initializing high frequency custom magnetometer update cycle");
             _dataArray = new byte[dataCount + MetaDataCount + TimeDataCount];
@@ -38,7 +37,7 @@ namespace DemoSat2016Netduino_OnboardSD.Work_Items
 
             for (var i = 0; i < _dataCount / 2; i++)
             {
-                var raw = (short)(MagPin.Read() * 1000);
+                var raw = (short)(_magPin.Read() * 1000);
                 var msb = (byte)((raw >> 8) & 0xFF);
                 var lsb = (byte)(raw & 0xff);
 

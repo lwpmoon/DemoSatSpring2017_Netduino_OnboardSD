@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using DemoSat2016Netduino_OnboardSD.Drivers;
 using DemoSat2016Netduino_OnboardSD.Flight_Computer;
+using FusionWare.SPOT.Hardware;
 
 namespace DemoSat2016Netduino_OnboardSD.Work_Items {
     public class PressureTempAltitudeUpdater {
@@ -15,8 +16,8 @@ namespace DemoSat2016Netduino_OnboardSD.Work_Items {
         private readonly int _delay;
         private readonly int _precision;
 
-        public PressureTempAltitudeUpdater(int sigFigs = 4, int delay = 30000) {
-            _bmpSensor = new Bmp180();
+        public PressureTempAltitudeUpdater(I2CBus bus, int sigFigs = 4, int delay = 30000) {
+            _bmpSensor = new Bmp180(bus);
             _dataArray = new byte[_dataCount + _metaDataCount + _timeDataCount];
             _dataArray[0] = (byte)PacketType.StartByte; // start bit = 0xff
             _dataArray[1] = (byte)PacketType.BmpDump;
