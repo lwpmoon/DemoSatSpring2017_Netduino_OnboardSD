@@ -2,7 +2,8 @@ using System;
 using System.Threading;
 using DemoSat2016Netduino_OnboardSD.Drivers;
 using DemoSat2016Netduino_OnboardSD.Flight_Computer;
-using FusionWare.SPOT.Hardware;
+using Microsoft.SPOT.Hardware;
+using test_bot_netduino;
 
 namespace DemoSat2016Netduino_OnboardSD.Work_Items {
     public class PressureTempAltitudeUpdater {

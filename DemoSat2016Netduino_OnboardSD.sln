@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoSat2016Netduino_OnboardSD", "DemoSat2016Netduino_OnboardSD.csproj", "{948050EA-77AA-4A88-9FE0-796543535B34}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroLiquidCrystal", "C:\Users\david\Desktop\Source\MicroLiquidCrystal\MicroLiquidCrystal.csproj", "{B4B72543-E638-44F1-B096-9BBB6BD4698B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +17,6 @@ Global
 		{948050EA-77AA-4A88-9FE0-796543535B34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{948050EA-77AA-4A88-9FE0-796543535B34}.Release|Any CPU.Build.0 = Release|Any CPU
 		{948050EA-77AA-4A88-9FE0-796543535B34}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{B4B72543-E638-44F1-B096-9BBB6BD4698B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B4B72543-E638-44F1-B096-9BBB6BD4698B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B4B72543-E638-44F1-B096-9BBB6BD4698B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B4B72543-E638-44F1-B096-9BBB6BD4698B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,9 +1,10 @@
 ﻿#undef BMP085_USE_DATASHEET_VALS
 using System;
 using DemoSat2016Netduino_OnboardSD.Utility;
-using FusionWare.SPOT.Hardware;
+//using FusionWare.SPOT.Hardware;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
+using test_bot_netduino;
 using Math = System.Math;
 
 // define for sanity check

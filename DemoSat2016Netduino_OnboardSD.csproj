@@ -34,10 +34,10 @@
   <ItemGroup>
     <Compile Include="BNOCalibUpdate.cs" />
     <Compile Include="Drivers\BMP180.cs" />
-    <Compile Include="Drivers\ExpensiveMag.cs" />
     <Compile Include="Drivers\SerialBNO.cs" />
-    <Compile Include="Work Items\CustomMagUpdater.cs" />
-    <Compile Include="Work Items\ExpensiveMagUpdater.cs" />
+    <Compile Include="I2CBus.cs" />
+    <Compile Include="LightTracker.cs" />
+    <Compile Include="Servo.cs" />
     <Compile Include="Work Items\MemoryMonitor.cs" />
     <Compile Include="Utility\PacketType.cs" />
     <Compile Include="Work Items\PressureTempAltitudeUpdater.cs" />
@@ -68,11 +68,5 @@
     <Reference Include="System" />
     <Reference Include="GoBus" />
     <Reference Include="System.IO" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="C:\Users\david\Desktop\Source\MicroLiquidCrystal\MicroLiquidCrystal.csproj">
-      <Project>{B4B72543-E638-44F1-B096-9BBB6BD4698B}</Project>
-      <Name>MicroLiquidCrystal</Name>
-    </ProjectReference>
   </ItemGroup>
 </Project>
