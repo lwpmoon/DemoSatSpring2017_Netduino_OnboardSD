@@ -1,11 +1,11 @@
 using System.Threading;
-using DemoSat2016Netduino_OnboardSD.Drivers;
-using DemoSat2016Netduino_OnboardSD.Flight_Computer;
-using DemoSat2016Netduino_OnboardSD.Work_Items;
+using DemoSatSpring2017Netduino_OnboardSD.Drivers;
+using DemoSatSpring2017Netduino_OnboardSD.Flight_Computer;
+using DemoSatSpring2017Netduino_OnboardSD.Work_Items;
 //using MicroLiquidCrystal;
 using Microsoft.SPOT;
 
-namespace DemoSat2016Netduino_OnboardSD {
+namespace DemoSatSpring2017Netduino_OnboardSD {
     public class BNOCalibUpdate {
         private readonly SerialBno _bno;
         private readonly int _delay;

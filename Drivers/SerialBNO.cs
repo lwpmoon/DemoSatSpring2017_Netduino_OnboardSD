@@ -2,11 +2,11 @@
 using System.IO.Ports;
 using System.Text;
 using System.Threading;
-using DemoSat2016Netduino_OnboardSD.Utility;
-using DemoSat2016Netduino_OnboardSD.Work_Items;
+using DemoSatSpring2017Netduino_OnboardSD.Utility;
+using DemoSatSpring2017Netduino_OnboardSD.Work_Items;
 using Microsoft.SPOT;
 
-namespace DemoSat2016Netduino_OnboardSD.Drivers {
+namespace DemoSatSpring2017Netduino_OnboardSD.Drivers {
     public class SerialBno {
 
         public SerialBno(string comPort, int readTimeout, int writeTimeout, Bno055OpMode mode = Bno055OpMode.OperationModeAccgyro) {

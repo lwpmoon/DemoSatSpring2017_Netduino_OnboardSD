@@ -1,6 +1,6 @@
 ﻿#undef BMP085_USE_DATASHEET_VALS
 using System;
-using DemoSat2016Netduino_OnboardSD.Utility;
+using DemoSatSpring2017Netduino_OnboardSD.Utility;
 //using FusionWare.SPOT.Hardware;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
@@ -9,7 +9,7 @@ using Math = System.Math;
 
 // define for sanity check
 
-namespace DemoSat2016Netduino_OnboardSD.Drivers
+namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 {
     public class Bmp180
     {

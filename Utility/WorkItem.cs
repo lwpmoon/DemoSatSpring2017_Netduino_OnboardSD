@@ -1,7 +1,7 @@
 using System.Threading;
-using DemoSat2016Netduino_OnboardSD.Flight_Computer;
+using DemoSatSpring2017Netduino_OnboardSD.Flight_Computer;
 
-namespace DemoSat2016Netduino_OnboardSD.Work_Items
+namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
 {
     public class WorkItem
     {
@@ -21,6 +21,15 @@ namespace DemoSat2016Netduino_OnboardSD.Work_Items
             Action = action;
             Loggable = loggable;
             PacketData = packetData;
+            _repeatable = persistent;
+            Persistent = persistent;
+            Pauseable = pauseable;
+
+            if (Pauseable) MemoryMonitor.Instance.RegisterPauseableAction(this);
+        }public WorkItem(ThreadStart action, bool loggable, bool persistent = false, bool pauseable = false)
+        {
+            Action = action;
+            Loggable = loggable;
             _repeatable = persistent;
             Persistent = persistent;
             Pauseable = pauseable;

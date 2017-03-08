@@ -4,7 +4,7 @@ using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 using SecretLabs.NETMF.Hardware.Netduino;
 
-namespace DemoSat2016Netduino_OnboardSD
+namespace DemoSatSpring2017Netduino_OnboardSD
 {
     public class ContServo : IDisposable
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace DemoSat2016Netduino_OnboardSD.Utility
+namespace DemoSatSpring2017Netduino_OnboardSD.Utility
 {
     internal static class Tools
     {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text;
-using DemoSat2016Netduino_OnboardSD.Flight_Computer;
+using DemoSatSpring2017Netduino_OnboardSD.Flight_Computer;
 
-namespace DemoSat2016Netduino_OnboardSD.Work_Items
+namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
 {
     public static class Rebug
     {

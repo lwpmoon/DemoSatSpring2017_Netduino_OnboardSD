@@ -1,4 +1,4 @@
-namespace DemoSat2016Netduino_OnboardSD.Work_Items {
+namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items {
     public enum PacketType : byte {
         StartByte = 0xFF,
         FMagDump = 0x00,

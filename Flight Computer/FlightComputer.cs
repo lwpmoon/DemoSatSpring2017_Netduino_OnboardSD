@@ -1,6 +1,6 @@
-﻿using DemoSat2016Netduino_OnboardSD.Work_Items;
+﻿using DemoSatSpring2017Netduino_OnboardSD.Work_Items;
 
-namespace DemoSat2016Netduino_OnboardSD.Flight_Computer {
+namespace DemoSatSpring2017Netduino_OnboardSD.Flight_Computer {
     public class FlightComputer {
     
         private static FlightComputer _instance;

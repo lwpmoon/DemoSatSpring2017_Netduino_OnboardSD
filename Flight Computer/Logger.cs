@@ -2,10 +2,10 @@
 using System.Collections;
 using System.IO;
 using System.Text;
-using DemoSat2016Netduino_OnboardSD.Work_Items;
+using DemoSatSpring2017Netduino_OnboardSD.Work_Items;
 using Microsoft.SPOT;
 
-namespace DemoSat2016Netduino_OnboardSD.Flight_Computer {
+namespace DemoSatSpring2017Netduino_OnboardSD.Flight_Computer {
     public class Logger  {
 
         private readonly Queue _pendingData = new Queue();

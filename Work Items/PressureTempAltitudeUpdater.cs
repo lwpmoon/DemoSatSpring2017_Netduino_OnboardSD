@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
-using DemoSat2016Netduino_OnboardSD.Drivers;
-using DemoSat2016Netduino_OnboardSD.Flight_Computer;
+using DemoSatSpring2017Netduino_OnboardSD.Drivers;
+using DemoSatSpring2017Netduino_OnboardSD.Flight_Computer;
 using Microsoft.SPOT.Hardware;
 using test_bot_netduino;
 
-namespace DemoSat2016Netduino_OnboardSD.Work_Items {
+namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items {
     public class PressureTempAltitudeUpdater {
         private readonly Bmp180 _bmpSensor;
 

@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace DemoSat2016Netduino_OnboardSD.Utility {
+namespace DemoSatSpring2017Netduino_OnboardSD.Utility {
     public struct Vector {
 
         public float[] InnerArray { get; private set; }
