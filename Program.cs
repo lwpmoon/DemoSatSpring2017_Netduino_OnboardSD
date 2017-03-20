@@ -9,7 +9,6 @@ using DemoSatSpring2017Netduino_OnboardSD.Work_Items;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 using SecretLabs.NETMF.Hardware.Netduino;
-using test_bot_netduino;
 
 namespace DemoSatSpring2017Netduino_OnboardSD {
     
@@ -32,20 +31,21 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
             Rebug.Print("Starting clock.");
             Clock.Instance.Start();
 
-            //var tracker = new LightTracker(PWMChannels.PWM_PIN_D5, PWMChannels.PWM_PIN_D10,
-            //                            Cpu.AnalogChannel.ANALOG_2, Cpu.AnalogChannel.ANALOG_0,
-            //                            Cpu.AnalogChannel.ANALOG_3, Cpu.AnalogChannel.ANALOG_1);
-
-            var tracker = new LightTracker(PWMChannels.PWM_PIN_D5, Cpu.AnalogChannel.ANALOG_0,
-                                        Cpu.AnalogChannel.ANALOG_1);
-            tracker.Start();
+            //var tracker = new LightTracker(PWMChannels.PWM_PIN_D5, Cpu.AnalogChannel.ANALOG_0,
+            //                            Cpu.AnalogChannel.ANALOG_1);
+            //tracker.Start();
 
 
             //THIS SECTION CREATES/INITIALIZES THE PRESSURE SENSOR
             //lcd.Write("Init BMP sensor.");
             Rebug.Print("Initializing BMP Sensor ");
-            var bmploop = new PressureTempAltitudeUpdater(bus, delay: 1000);
+            var bmp280Loop = new PressureTempAltitudeUpdater(bus, delay: 1000);
+            Rebug.Print("Initializing BMP Sensor ");
+
             //LCDFinish(lcd);
+
+            Rebug.Print("Initializing Heater Controler ");
+            
 
             //THIS SECTION CREATES/INITIALIZES THE SERIAL BNO 100HZ UPDATER
             
@@ -82,9 +82,8 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
 
             //THIS STARTS THE BNO SENSOR UPDATE
             //lcd.Write("Start bmp loop");
-            //TODO BNP180 discontinued... Update at later time
             Rebug.Print("Starting bmp sensor updates...");
-            bmploop.Start();
+            bmp280Loop.Start();
             //LCDFinish(lcd);
 
             //lcd.Write("Boot successful!");

@@ -1,12 +1,10 @@
 using System.Threading;
-using Microsoft.SPOT;
-using Microsoft.SPOT.Hardware;
-using System;
-using DemoSatSpring2017Netduino_OnboardSD;
 using DemoSatSpring2017Netduino_OnboardSD.Flight_Computer;
 using DemoSatSpring2017Netduino_OnboardSD.Work_Items;
+using Microsoft.SPOT;
+using Microsoft.SPOT.Hardware;
 
-namespace DemoSatSpring2017Netduino_OnboardSD
+namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 {
     public class LightTracker
     {

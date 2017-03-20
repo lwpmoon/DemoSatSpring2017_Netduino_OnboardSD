@@ -1,8 +1,7 @@
 using System;
-using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 
-namespace test_bot_netduino
+namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 {
     public class I2CBus : IDisposable
     {

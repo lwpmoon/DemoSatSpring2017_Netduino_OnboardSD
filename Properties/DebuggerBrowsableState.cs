@@ -3,13 +3,13 @@
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RockSat-C_Multithreaded")]
-[assembly: AssemblyDescription("Flight code for CC-CO Rocksat payload")]
+[assembly: AssemblyTitle("DemoSat_Multithreaded")]
+[assembly: AssemblyDescription("Flight code for ACC DemoSat payloads")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("JDC Network Solutions")]
-[assembly: AssemblyProduct("RockSat-C_Multithreaded")]
-[assembly: AssemblyCopyright("Copyright David Colclazier © 2016")]
-[assembly: AssemblyTrademark("RockSatCSharp TM")]
+[assembly: AssemblyCompany("Arapahoe Community College")]
+[assembly: AssemblyProduct("DemoSat_Multithreaded")]
+[assembly: AssemblyCopyright("Copyright Colorado Space Grant Consortium © 2017")]
+[assembly: AssemblyTrademark("DemoSat TM")]
 [assembly: AssemblyCulture("")]
 
 // Version information for an assembly consists of the following four values:

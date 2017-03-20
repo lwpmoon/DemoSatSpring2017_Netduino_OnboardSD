@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <AssemblyName>DemoSat2016Netduino_OnboardSD</AssemblyName>
+    <AssemblyName>DemoSatSpring2017Netduino_OnboardSD</AssemblyName>
     <OutputType>Exe</OutputType>
-    <RootNamespace>DemoSat2016Netduino_OnboardSD</RootNamespace>
+    <RootNamespace>DemoSatSpring2017Netduino_OnboardSD</RootNamespace>
     <ProjectTypeGuids>{b69e3092-b931-443c-abe7-7e7b65f2a37f};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
@@ -32,12 +32,16 @@
   </PropertyGroup>
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <ItemGroup>
-    <Compile Include="BNOCalibUpdate.cs" />
-    <Compile Include="Drivers\BMP180.cs" />
+    <Compile Include="Drivers\BMP280.cs" />
+    <Compile Include="Drivers\LiPoFuelGauge.cs" />
+    <Compile Include="Work Items\BatteryStateUpdater.cs" />
+    <Compile Include="Work Items\BNOCalibUpdate.cs" />
+    <Compile Include="Drivers\HeaterControler.cs" />
     <Compile Include="Drivers\SerialBNO.cs" />
-    <Compile Include="I2CBus.cs" />
-    <Compile Include="LightTracker.cs" />
-    <Compile Include="Servo.cs" />
+    <Compile Include="Drivers\I2CBus.cs" />
+    <Compile Include="Drivers\LightTracker.cs" />
+    <Compile Include="Drivers\Servo.cs" />
+    <Compile Include="Work Items\HeaterUpdater.cs" />
     <Compile Include="Work Items\MemoryMonitor.cs" />
     <Compile Include="Utility\PacketType.cs" />
     <Compile Include="Work Items\PressureTempAltitudeUpdater.cs" />
