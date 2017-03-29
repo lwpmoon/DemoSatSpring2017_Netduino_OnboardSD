@@ -80,14 +80,20 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         private Bmp280CompData _bmp280Compensations;
 
         private readonly I2CDevice.Configuration _slaveConfig;
+<<<<<<< Updated upstream
         //private I2CBus _bus;
         private const int TransactionTimeout = 1000;
+=======
+        private I2CBus _bus;
+        private const int TransactionTimeout = 1000; // ms
+        private const int ClockSpeed = Program.I2CclockSpeed;
+>>>>>>> Stashed changes
 
         public Bmp280(byte address = 0x77, Mode mode = Mode.Ultrahighres)
         {
             //_bus = bus;
             Bmp280Address = address;
-            _slaveConfig = new I2CDevice.Configuration(Bmp280Address, 100);
+            _slaveConfig = new I2CDevice.Configuration(Bmp280Address, ClockSpeed);
             while (!Init(mode))
             {
 

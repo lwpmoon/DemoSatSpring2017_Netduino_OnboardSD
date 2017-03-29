@@ -17,9 +17,11 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
     
     public static class Program
     {
-        
+        public const int I2CclockSpeed = 100;
+
         public static void Main() {
             //I2CBus bus = new I2CBus();
+            
             
             //THIS SECTION CREATES / INITIALIZES THE SERIAL LOGGER
             Rebug.Print("Flight computer started successfully. Beginning INIT.");
