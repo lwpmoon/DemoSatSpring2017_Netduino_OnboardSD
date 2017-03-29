@@ -16,8 +16,8 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items {
         private readonly int _delay;
         private readonly int _precision;
 
-        public PressureTempAltitudeUpdater(I2CBus bus, int sigFigs = 4, int delay = 30000) {
-            _bmpSensor = new Bmp280(bus);
+        public PressureTempAltitudeUpdater(int sigFigs = 4, int delay = 30000) {
+            _bmpSensor = new Bmp280();
             _dataArray = new byte[_dataCount + _metaDataCount + _timeDataCount];
             _dataArray[0] = (byte)PacketType.StartByte; // start bit = 0xff
             _dataArray[1] = (byte)PacketType.BmpDump;
@@ -27,7 +27,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items {
 
             _workItem = new WorkItem(BmpUpdater, ref _dataArray, true, true, true);
 
-            _bmpSensor.Init();
+            //_bmpSensor.Init(); Extraneous???
         }
 
         private void BmpUpdater() {

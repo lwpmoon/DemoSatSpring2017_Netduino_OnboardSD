@@ -19,13 +19,13 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
     {
         
         public static void Main() {
-            I2CBus bus = new I2CBus();
+            //I2CBus bus = new I2CBus();
             
             //THIS SECTION CREATES / INITIALIZES THE SERIAL LOGGER
-            Debug.Print("Flight computer started successfully. Beginning INIT.");
+            Rebug.Print("Flight computer started successfully. Beginning INIT.");
             
             var logger = new Logger();
-            Debug.Print("Starting logger.");
+            Rebug.Print("Starting logger.");
             logger.Start();
 
             Rebug.Print("Starting clock.");
@@ -39,13 +39,14 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
             //THIS SECTION CREATES/INITIALIZES THE PRESSURE SENSOR
             //lcd.Write("Init BMP sensor.");
             Rebug.Print("Initializing BMP Sensor ");
-            var bmp280Loop = new PressureTempAltitudeUpdater(bus, delay: 1000);
-            Rebug.Print("Initializing BMP Sensor ");
+            var bmp280Loop = new PressureTempAltitudeUpdater(delay: 1000);
 
             //LCDFinish(lcd);
 
             Rebug.Print("Initializing Heater Controler ");
-            
+            var heater = new HeaterUpdater();
+            heater.Start();
+
 
             //THIS SECTION CREATES/INITIALIZES THE SERIAL BNO 100HZ UPDATER
             
@@ -62,12 +63,12 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
 
             //Thread.Sleep(5000);
             //lcd.Write("Init complete...");
-            Rebug.Print("Flight computer INIT Complete. Continuing with boot.");
+            Debug.Print("Flight computer INIT Complete. Continuing with boot.");
             //LCDFinish(lcd, "Continuing boot.");
 
             //THIS SECTION INITIALIZES AND STARTS THE MEMORY MONITOR
             //lcd.Write("Start memory monitor...");
-            Rebug.Print("Starting memory monitor...");
+            Debug.Print("Starting memory monitor...");
             MemoryMonitor.Instance.Start(ref logger);
             //LCDFinish(lcd, "Done.");
 
@@ -89,8 +90,8 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
             //lcd.Write("Boot successful!");
             //LCDFinish(lcd,"Entering run state.");
 
-            Rebug.Print("Flight computer boot successful.");
-            printBnoCalib.Start();
+            Debug.Print("Flight computer boot successful.");
+            //printBnoCalib.Start();
         }
 
         public static void custom_delay_usec(int microseconds)
