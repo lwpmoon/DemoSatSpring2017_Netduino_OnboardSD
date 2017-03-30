@@ -1,4 +1,5 @@
 using System;
+using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 
 namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
@@ -6,20 +7,25 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
     public class I2CBus : IDisposable
     {
         /*public static I2CBus _instance = null;
-        public static readonly object LockObject = new object();*/
+        public static readonly object locker = new object();*/
 
-        public static I2CBus _instance = null;
-        public static readonly object LockObject = new object();
-
-        public static I2CBus GetInstance() {
-            lock (LockObject) {
-                return _instance ?? (_instance = new I2CBus());
-            }
+        public static I2CBus Instance {
+            get {
+                lock (Locker)
+                {
+                    return _instance ?? (_instance = new I2CBus());
+                }
+            } 
+            
         }
+
+        private static I2CBus _instance = null;
+        private static readonly object Locker = new object();
+
 
 
         //private readonly I2CDevice _slaveDevice;
-        public I2CDevice _slaveDevice;
+        private readonly I2CDevice _slaveDevice;
 
         public I2CBus() {
             _slaveDevice = new I2CDevice(new I2CDevice.Configuration(0, 0));
@@ -38,14 +44,14 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             // create an i2c write transaction to be sent to the device.
             var writeXAction = new I2CDevice.I2CTransaction[] {I2CDevice.CreateWriteTransaction(writeBuffer)};
 
-            lock (_slaveDevice)
+            lock (Locker)
             {
                 // the i2c data is sent here to the device.
                 var transferred = _slaveDevice.Execute(writeXAction, transactionTimeout);
 
                 // make sure the data was sent.
                 if (transferred != writeBuffer.Length)
-                    throw new Exception("Could not write to device.");
+                    Debug.Print("Could not write to I2C Device!");
             }
 
             // Set i2c device configuration.
@@ -54,14 +60,14 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             // create an i2c read transaction to be sent to the device.
             var readXAction = new I2CDevice.I2CTransaction[] {I2CDevice.CreateReadTransaction(readBuffer)};
 
-            lock (_slaveDevice)
+            lock (Locker)
             {
                 // the i2c data is received here from the device.
                 var transferred = _slaveDevice.Execute(readXAction, transactionTimeout);
 
                 // make sure the data was received.
                 if (transferred != readBuffer.Length)
-                    throw new Exception("Could not read from device.");
+                    Debug.Print("Could not read from I2C Device!");
             }
         }
 
@@ -73,13 +79,13 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             // create an i2c write transaction to be sent to the device.
             var writeXAction = new I2CDevice.I2CTransaction[] { I2CDevice.CreateWriteTransaction(writeBuffer) };
 
-            lock (_slaveDevice) {
+            lock (Locker) {
                 // the i2c data is sent here to the device.
                 var transferred = _slaveDevice.Execute(writeXAction, transactionTimeout);
 
                 // make sure the data was sent.
                 if (transferred != writeBuffer.Length)
-                    throw new Exception("Could not write to device.");
+                    Debug.Print("Could not write to I2C Device!");
             }
         }
 
@@ -91,14 +97,15 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             // create an i2c read transaction to be sent to the device.
             var readXAction = new I2CDevice.I2CTransaction[] { I2CDevice.CreateReadTransaction(readBuffer) };
 
-            lock (_slaveDevice)
+            lock (Locker)
             {
                 // the i2c data is received here from the device.
                 var transferred = _slaveDevice.Execute(readXAction, transactionTimeout);
 
                 // make sure the data was received.
                 if (transferred != readBuffer.Length)
-                    throw new Exception("Could not read from device.");
+                    //throw new Exception("Could not read from device.");
+                    Debug.Print("Could not read from I2C Device!");
             }
         }
 

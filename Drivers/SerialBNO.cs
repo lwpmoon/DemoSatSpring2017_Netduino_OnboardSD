@@ -20,7 +20,9 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers {
         public bool Begin()
         {
             Rebug.Print("Opening BNO communications channel...");
-            _comPort.Open();
+            lock (Locker) {
+                _comPort.Open();
+            }
 
             ConfigMode();
             write_byte(Bno055Registers.Bno055PageIdAddr, 0);
@@ -52,8 +54,8 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers {
             var calData = read_byte(Bno055Registers.Bno055CalibStatAddr);
             calib[0] = (byte)((calData >> 6) & 0x03); //sys
             calib[1] = (byte)((calData >> 4) & 0x03); //gyr
-            calib[1] = (byte)((calData >> 2) & 0x03); //acc
-            calib[1] = (byte)(calData & 0x03); //mag
+            calib[2] = (byte)((calData >> 2) & 0x03); //acc
+            calib[3] = (byte)(calData & 0x03); //mag
             return calib;
         }
         public Vector read_vector(Bno055VectorType vec, int count = 3) {
@@ -79,7 +81,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers {
 
         }
 
-        private byte[] serial_send(byte[] command, int expectedLength, bool ack = true, int maxTries = 10, int tries = 0) {
+        private byte[] serial_send(byte[] command, int expectedLength, bool ack = true, int maxTries = 100, int tries = 0) {
             lock (Locker) {
                 _comPort.Flush();
                 _comPort.Write(command, 0, command.Length);
@@ -88,7 +90,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers {
                 if (!ack) return null;
 
                 //wait for serial stream to fill with expected ack data
-                Thread.Sleep(500); //bug THIS THIS SLOW... should wait until correct amount of data is ready to be read.
+                Thread.Sleep(750); //bug THIS THIS SLOW... should wait until correct amount of data is ready to be read.
 
                 var response = new byte[_comPort.BytesToRead];
                 var readCount = _comPort.Read(response, 0, response.Length);

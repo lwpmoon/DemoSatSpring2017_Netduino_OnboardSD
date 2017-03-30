@@ -19,22 +19,16 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
     {
         
         public static void Main() {
-            //I2CBus bus = new I2CBus();
             
             //THIS SECTION CREATES / INITIALIZES THE SERIAL LOGGER
-            Rebug.Print("Flight computer started successfully. Beginning INIT.");
+            Debug.Print("Flight computer started successfully. Beginning INIT.");
             
             var logger = new Logger();
-            Rebug.Print("Starting logger.");
+            Debug.Print("Starting logger.");
             logger.Start();
 
             Rebug.Print("Starting clock.");
             Clock.Instance.Start();
-
-            //var tracker = new LightTracker(PWMChannels.PWM_PIN_D5, Cpu.AnalogChannel.ANALOG_0,
-            //                            Cpu.AnalogChannel.ANALOG_1);
-            //tracker.Start();
-
 
             //THIS SECTION CREATES/INITIALIZES THE PRESSURE SENSOR
             //lcd.Write("Init BMP sensor.");
@@ -45,8 +39,6 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
 
             Rebug.Print("Initializing Heater Controler ");
             var heater = new HeaterUpdater();
-            heater.Start();
-
 
             //THIS SECTION CREATES/INITIALIZES THE SERIAL BNO 100HZ UPDATER
             
@@ -54,44 +46,28 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
             var bno = new SerialBno(SerialPorts.COM1, 5000, 5000, SerialBno.Bno055OpMode.OperationModeNdof);
             var bnoloop = new SerialBnoUpdater(bno, delay: 1000);
 
-            
-            Rebug.Print("Initializing BNO calibration display loop");
-            var printBnoCalib = new BNOCalibUpdate(bno, delay: 1000);
-            //LCDFinish(lcd, "Done.");
 
-           
+            var tracker = new LightTracker(bno, PWMChannels.PWM_PIN_D5);
+            tracker.Start();
 
-            //Thread.Sleep(5000);
-            //lcd.Write("Init complete...");
-            Debug.Print("Flight computer INIT Complete. Continuing with boot.");
-            //LCDFinish(lcd, "Continuing boot.");
+            Rebug.Print("Flight computer INIT Complete. Continuing with boot.");
 
             //THIS SECTION INITIALIZES AND STARTS THE MEMORY MONITOR
-            //lcd.Write("Start memory monitor...");
-            Debug.Print("Starting memory monitor...");
+            Rebug.Print("Starting memory monitor...");
             MemoryMonitor.Instance.Start(ref logger);
-            //LCDFinish(lcd, "Done.");
 
+            Rebug.Print("Starting heater...");
+            //heater.Start();
             
-            //LCDFinish(lcd, "Done.");
-
             ////THIS STARTS THE BNO SENSOR UPDATE
-            //lcd.Write("Start bno loop...");
             Rebug.Print("Starting bno sensor updates...");
-            bnoloop.Start();
-            //LCDFinish(lcd, "Done.");
+            //bnoloop.Start();
 
             //THIS STARTS THE BNO SENSOR UPDATE
-            //lcd.Write("Start bmp loop");
-            Rebug.Print("Starting bmp sensor updates...");
+            //Rebug.Print("Starting bmp sensor updates...");
             bmp280Loop.Start();
-            //LCDFinish(lcd);
-
-            //lcd.Write("Boot successful!");
-            //LCDFinish(lcd,"Entering run state.");
 
             Debug.Print("Flight computer boot successful.");
-            //printBnoCalib.Start();
         }
 
         public static void custom_delay_usec(int microseconds)

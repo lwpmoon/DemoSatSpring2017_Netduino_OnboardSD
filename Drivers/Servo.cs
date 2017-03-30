@@ -1,112 +1,76 @@
 using System;
 using System.Threading;
-using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
-using SecretLabs.NETMF.Hardware.Netduino;
 
-namespace DemoSatSpring2017Netduino_OnboardSD
+namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 {
     public class ContServo : IDisposable
     {
 
-        private PWM servo;
-        private int _leftTicksTaken;
-        private int _rightTicksTaken;
+        private readonly PWM _servo;
+        private double _lastRecoveryAmount;
 
-        private int _maxClockwise = 1300;
-        private int _maxCounterClockwise = 1700;
-
-        public int get_ticks()
+    
+        public ContServo(Cpu.PWMChannel servoPin)
         {
-            return _rightTicksTaken - _leftTicksTaken;
-        }
+            _servo = new PWM(servoPin, 20, 0, false);
 
-        public ContServo(Cpu.PWMChannel servo_pin)
-        {
-            servo = new PWM(servo_pin, 20, 0, false);
-            servo.Start();
+            _servo.Start();
 
 
         }
 
-        public void go_to_zero()
-        {
-            int test = -get_ticks();
-            if (test > 0)
-            {
-                for (int i = 0; i < test; i++)
-                {
-                    go_clockwise_one_tick();
-                }
-            }
-            else if (test < 0)
-            {
-                for (int i = 0; i < -test; i++)
-                {
-                    go_counterclockwise_one_tick();
-                }
-            }
+        public void Recover(double amount) {
+
+            var recoveryDifference = amount - _lastRecoveryAmount;
+            if (Math.Abs(recoveryDifference) < 1) return;
+            
+            _servo.Duration = (uint) (recoveryDifference < 0 ? 1100 : 2200);
+            _servo.Start();
+            //how much different since the last recover?
+
+            Thread.Sleep(Math.Abs((int)recoveryDifference) * 8);
+            _servo.Stop();
+            _lastRecoveryAmount = amount;
 
         }
 
-
-        public void go_clockwise_one_tick()
-        {
-            servo.Duration = (uint)1300;
-            servo.Start();
-            Thread.Sleep(20);
-            servo.Stop();
-            Thread.Sleep(200);
-            _rightTicksTaken++;
-
-            // Debug.Print("Right ticks taken " + _rightTicksTaken);
-            // Debug.Print("Total Tick count: " + get_ticks());
+        public void Clockwise() {
+            _servo.Duration = 1300;
+            _servo.Start();
         }
 
-        public void go_counterclockwise_one_tick()
-        {
-            servo.Duration = (uint)2100;
-            servo.Start();
-            Thread.Sleep(20);
-            servo.Stop();
-            Thread.Sleep(200);
-            _leftTicksTaken++;
-            // Debug.Print("Left ticks taken " + _leftTicksTaken);
-            // Debug.Print("Total Tick count: " + get_ticks());
+        public void CounterClockwise() {
+            _servo.Duration = 2100;
+            _servo.Start();
         }
 
+        public void Stop() {
+            _servo.Stop();
+        }
+
+      
         public void Dispose()
         {
-            throw new NotImplementedException();
+            
         }
-        public double map(double s, double a1, double a2, double b1, double b2)
-        {
-            return b1 + (s - a1) * (b2 - b1) / (a2 - a1);
-        }
-
-        public void reset_ticks()
-        {
-            _leftTicksTaken = 0;
-            _rightTicksTaken = 0;
-        }
-
     }
     public class Servo : IDisposable
     {
         /// <summary>
         /// PWM handle
         /// </summary>
-        private PWM servo;
+        private readonly PWM _servo;
 
         /// <summary>
         /// Timings range
         /// </summary>
-        private readonly int[] range = new int[2];
+        private readonly int[] _range = new int[2];
 
         /// <summary>
         /// Set servo inversion
         /// </summary>
-        public bool inverted = false;
+        public bool Inverted = false;
 
         private int _current;
 
@@ -119,20 +83,20 @@ namespace DemoSatSpring2017Netduino_OnboardSD
         {
             // Init the PWM pin
             // servo = new PWM((Cpu.PWMChannel)channelPin, 20000, 1500, PWM.ScaleFactor.Microseconds, false);
-            servo = new PWM(channelPin, 20000, 1500, Microsoft.SPOT.Hardware.PWM.ScaleFactor.Microseconds, false)
+            _servo = new PWM(channelPin, 20000, 1500, PWM.ScaleFactor.Microseconds, false)
             {
                 Period = 20000
             };
             Degree = initialPosition;
             // Typical settings
-            range[0] = 500;
-            range[1] = 2100;
+            _range[0] = 500;
+            _range[1] = 2100;
         }
 
         public void Dispose()
         {
-            disengage();
-            servo.Dispose();
+            Disengage();
+            _servo.Dispose();
         }
 
         /// <summary>
@@ -140,20 +104,20 @@ namespace DemoSatSpring2017Netduino_OnboardSD
         /// </summary>
         /// <param name="fullLeft"></param>
         /// <param name="fullRight"></param>
-        public void setRange(int fullLeft, int fullRight)
+        public void SetRange(int fullLeft, int fullRight)
         {
-            range[1] = fullLeft;
-            range[0] = fullRight;
+            _range[1] = fullLeft;
+            _range[0] = fullRight;
         }
 
         /// <summary>
         /// Disengage the servo. 
         /// The servo motor will stop trying to maintain an angle
         /// </summary>
-        public void disengage()
+        public void Disengage()
         {
             // See what the Netduino team say about this... 
-            servo.DutyCycle = 0; //SetDutyCycle(0);
+            _servo.DutyCycle = 0; //SetDutyCycle(0);
         }
 
         /// <summary>
@@ -172,21 +136,21 @@ namespace DemoSatSpring2017Netduino_OnboardSD
                     value = 0;
 
                 // Are we inverted?
-                if (inverted)
+                if (Inverted)
                     value = 180 - value;
 
                 // Set the pulse
                 //servo.SetPulse(20000, (uint)map((long)value, 0, 180, range[0], range[1]));
-                servo.Duration = (uint)map((long)value, 0, 180, range[0], range[1]);
-                servo.Start();
+                _servo.Duration = (uint)Map((long)value, 0, 180, _range[0], _range[1]);
+                _servo.Start();
                 _current = (int)value;
             }
         }
 
 
-        private long map(long x, long in_min, long in_max, long out_min, long out_max)
+        private long Map(long x, long inMin, long inMax, long outMin, long outMax)
         {
-            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+            return (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
         }
     }
     //    public class ServoController : IDisposable

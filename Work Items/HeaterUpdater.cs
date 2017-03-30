@@ -27,7 +27,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
             _delay = delay;
             _precision = (int)Math.Pow(10, sigFigs - 1);
 
-            _workItem = new WorkItem(HeaterControl, true, true, true);
+            _workItem = new WorkItem(HeaterControl, false, true, true);
         }
 
         private void HeaterControl()
