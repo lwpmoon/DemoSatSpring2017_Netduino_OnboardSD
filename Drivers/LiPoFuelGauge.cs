@@ -9,12 +9,13 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         private I2CBus _bus;
         private readonly I2CDevice.Configuration _slaveConfig;
         private const int TransactionTimeout = 1000;
+        private const int ClockSpeed = Program.I2CclockSpeed;
 
 
         public LiPoFuelGauge(I2CBus bus, byte address = (byte) Registers.Max17043Address)
         {
             _bus = bus;
-            _slaveConfig = new I2CDevice.Configuration(address, 100);
+            _slaveConfig = new I2CDevice.Configuration(address, ClockSpeed);
         }
 
         public double GetVCell()
