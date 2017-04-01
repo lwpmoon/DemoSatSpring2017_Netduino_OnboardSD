@@ -252,6 +252,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             return (ulong)lux;
         }
 
+        /*
         ulong getFullLuminosity()
         {
             if (!_initialized)
@@ -386,12 +387,12 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             uint32_t lum = getFullLuminosity();
             /* Early silicon seems to have issues when there is a sudden jump in */
             /* light levels. :( To work around this for now sample the sensor 2x */
-            lum = getFullLuminosity();
+            /*lum = getFullLuminosity();
             ir = lum >> 16;
             full = lum & 0xFFFF;
 
             /* Clear the event */
-            memset(event, 0, sizeof(sensors_event_t));
+            /*memset(event, 0, sizeof(sensors_event_t));
 
             event->version   = sizeof(sensors_event_t);
             event->sensor_id = _sensorID;
@@ -400,9 +401,9 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
             /* Calculate the actual lux value */
             /* 0 = sensor overflow (too much light) */
-            event->light = calculateLux(full, ir);
+            /*event->light = calculateLux(full, ir);
 
-            return true;
-        }
+            return true;*/
+        //}
     }
 }

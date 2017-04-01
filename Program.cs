@@ -34,19 +34,21 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
 
             //THIS SECTION CREATES/INITIALIZES THE PRESSURE SENSOR
             //lcd.Write("Init BMP sensor.");
-            Rebug.Print("Initializing BMP Sensor ");
-            var bmp280Loop = new PressureTempAltitudeUpdater(delay: 1000);
+            //Rebug.Print("Initializing BMP Sensor ");
+            //var bmp280Loop = new PressureTempAltitudeUpdater(delay: 1000);
 
             //LCDFinish(lcd);
 
             Rebug.Print("Initializing Heater Controler ");
             var heater = new HeaterUpdater();
+            heater.Start();
 
             //THIS SECTION CREATES/INITIALIZES THE SERIAL BNO 100HZ UPDATER
             
             Rebug.Print("Initializing BNO Sensor ");
             var bno = new SerialBno(SerialPorts.COM1, 5000, 5000, SerialBno.Bno055OpMode.OperationModeNdof);
-            var bnoloop = new SerialBnoUpdater(bno, delay: 1000);
+            bno.Begin();
+            //var bnoloop = new SerialBnoUpdater(bno, delay: 1000);
 
 
             var tracker = new LightTracker(bno, PWMChannels.PWM_PIN_D5);
@@ -67,7 +69,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
 
             //THIS STARTS THE BNO SENSOR UPDATE
             //Rebug.Print("Starting bmp sensor updates...");
-            bmp280Loop.Start();
+            //bmp280Loop.Start();
 
             Debug.Print("Flight computer boot successful.");
         }

@@ -25,7 +25,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             var recoveryDifference = amount - _lastRecoveryAmount;
             if (Math.Abs(recoveryDifference) < 1) return;
             
-            _servo.Duration = (uint) (recoveryDifference < 0 ? 1100 : 2200);
+            _servo.Duration = (uint) (recoveryDifference < 0 ? 2200 : 1100);
             _servo.Start();
             //how much different since the last recover?
 

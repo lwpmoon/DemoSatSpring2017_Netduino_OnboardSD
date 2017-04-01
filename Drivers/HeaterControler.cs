@@ -31,6 +31,8 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
             SetHeater(temperature, heaterTemp);
 
+            Rebug.Print("Heater heaterTemp: " + heaterTemp);
+            Rebug.Print("Internal Temp: " + temperature);
             Debug.Print("Heater heaterTemp: " + heaterTemp);
             Debug.Print("Internal Temp: " + temperature);
         }
@@ -74,14 +76,14 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         {
             double power = 0;
 
-            if (heaterTemp <= 100)
+            if (heaterTemp <= 120)
             {
-                if (temperature >= 78) power = 0;
-                if (temperature < 78 && temperature >= 76) power = 0.2;
-                if (temperature < 76 && temperature >= 74) power = 0.4;
-                if (temperature < 74 && temperature >= 72) power = 0.6;
-                if (temperature < 72 && temperature >= 70) power = 0.8;
-                if (temperature < 70 && temperature >= 0) power = 1; 
+                if (temperature >= 75) power = 0;
+                if (temperature < 75 && temperature >= 73) power = 0.2;
+                if (temperature < 73 && temperature >= 65) power = 0.4;
+                if (temperature < 65 && temperature >= 50) power = 0.6;
+                if (temperature < 50 && temperature >= 30) power = 0.8;
+                if (temperature < 30 && temperature >= 0) power = 1; 
             }
 
             _heaterControlPin.DutyCycle = power;

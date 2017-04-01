@@ -28,7 +28,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
             _bno = bno;
             _panServo = new ContServo(panPin);
-            _panServo.reset_ticks();
+            //s_panServo.reset_ticks();
 
             _zeroPointHeading = bno.read_vector(SerialBno.Bno055VectorType.VectorEuler);
 
