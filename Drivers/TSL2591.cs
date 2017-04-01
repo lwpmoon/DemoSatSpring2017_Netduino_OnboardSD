@@ -108,13 +108,11 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
 
         private readonly I2CDevice.Configuration _slaveConfig;
-        private I2CBus _bus;
         private const int TransactionTimeout = 1000; // ms
         private const int ClockSpeed = Program.I2CclockSpeed;
         
-        public Tsl2591(I2CBus bus, byte address = 0x29, Gain gain = Gain.MED, Integrationtime inte = Integrationtime._100MS)
+        public Tsl2591(byte address = 0x29, Gain gain = Gain.MED, Integrationtime inte = Integrationtime._100MS)
         {
-            _bus = bus;
             _tsl2591Address = address;
             _slaveConfig = new I2CDevice.Configuration(_tsl2591Address, ClockSpeed);
             _initialized = false;
@@ -135,11 +133,11 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         {
             byte[] whoami = { 0 };
 
-            _bus.WriteRead(_slaveConfig, new[] { (byte)Registers.DEVICE_ID }, whoami, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.DEVICE_ID, whoami, TransactionTimeout);
 
             if (whoami[0] != 0x50) return false;
 
-            _bus.Write(_slaveConfig, new []{(byte) Bits.COMMAND_BIT, (byte) gain, (byte) integrationtime}, TransactionTimeout);
+            I2CBus.Instance.Write(_slaveConfig, new []{(byte) Bits.COMMAND_BIT, (byte) gain, (byte) integrationtime}, TransactionTimeout);
 
             return true;
         }
@@ -155,7 +153,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             }
 
             // Enable the device by setting the control bit to 0x01
-            _bus.Write(_slaveConfig,new []{ (byte)Bits.COMMAND_BIT, (byte) Registers.ENABLE, (byte) Enable.POWERON, (byte) Enable.AEN, (byte) Enable.AIEN, (byte) Enable.NPIEN}, TransactionTimeout);
+            I2CBus.Instance.Write(_slaveConfig,new []{ (byte)Bits.COMMAND_BIT, (byte) Registers.ENABLE, (byte) Enable.POWERON, (byte) Enable.AEN, (byte) Enable.AIEN, (byte) Enable.NPIEN}, TransactionTimeout);
         }
 
         private void disable()
@@ -170,7 +168,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
             // Disable the device by setting the control bit to 0x00
             //write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE, TSL2591_ENABLE_POWEROFF);
-            _bus.Write(_slaveConfig, new []{(byte) Bits.COMMAND_BIT, (byte) Registers.ENABLE, (byte) Enable.POWEROFF}, TransactionTimeout);
+            I2CBus.Instance.Write(_slaveConfig, new []{(byte) Bits.COMMAND_BIT, (byte) Registers.ENABLE, (byte) Enable.POWEROFF}, TransactionTimeout);
         }
 
         private void SetCoefficents()

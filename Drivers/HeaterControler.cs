@@ -33,8 +33,8 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
             Rebug.Print("Heater heaterTemp: " + heaterTemp);
             Rebug.Print("Internal Temp: " + temperature);
-            Debug.Print("Heater heaterTemp: " + heaterTemp);
-            Debug.Print("Internal Temp: " + temperature);
+            ////Debug.Print("Heater heaterTemp: " + heaterTemp);
+            //Debug.Print("Internal Temp: " + temperature);
         }
 
 

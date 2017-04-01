@@ -21,10 +21,16 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
 
         public static void Main() {
             
+            //init i2c
+            var i2cBus = I2CBus.Instance;
+
             
+            var updater = new BatteryStateUpdater();
+            updater.Start();
+
             //THIS SECTION CREATES / INITIALIZES THE SERIAL LOGGER
             Debug.Print("Flight computer started successfully. Beginning INIT.");
-            
+
             var logger = new Logger();
             Debug.Print("Starting logger.");
             logger.Start();
@@ -32,27 +38,26 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
             Rebug.Print("Starting clock.");
             Clock.Instance.Start();
 
-            //THIS SECTION CREATES/INITIALIZES THE PRESSURE SENSOR
+            //THIS SECTION CREATES / INITIALIZES THE PRESSURE SENSOR
             //lcd.Write("Init BMP sensor.");
-            //Rebug.Print("Initializing BMP Sensor ");
-            //var bmp280Loop = new PressureTempAltitudeUpdater(delay: 1000);
+            Rebug.Print("Initializing BMP Sensor ");
+            var bmp280Loop = new PressureTempAltitudeUpdater(delay: 1000);
 
             //LCDFinish(lcd);
 
             Rebug.Print("Initializing Heater Controler ");
-            var heater = new HeaterUpdater();
-            heater.Start();
+            //var heater = new HeaterUpdater();
 
             //THIS SECTION CREATES/INITIALIZES THE SERIAL BNO 100HZ UPDATER
-            
+
             Rebug.Print("Initializing BNO Sensor ");
             var bno = new SerialBno(SerialPorts.COM1, 5000, 5000, SerialBno.Bno055OpMode.OperationModeNdof);
             bno.Begin();
             //var bnoloop = new SerialBnoUpdater(bno, delay: 1000);
 
-
+            Rebug.Print("Initializing tracker");
             var tracker = new LightTracker(bno, PWMChannels.PWM_PIN_D5);
-            tracker.Start();
+            
 
             Rebug.Print("Flight computer INIT Complete. Continuing with boot.");
 
@@ -62,14 +67,17 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
 
             Rebug.Print("Starting heater...");
             //heater.Start();
-            
+
             ////THIS STARTS THE BNO SENSOR UPDATE
-            Rebug.Print("Starting bno sensor updates...");
+            //Rebug.Print("Starting bno sensor updates...");
             //bnoloop.Start();
 
+            Rebug.Print("Starting Solar tracker");
+            tracker.Start();
+
             //THIS STARTS THE BNO SENSOR UPDATE
-            //Rebug.Print("Starting bmp sensor updates...");
-            //bmp280Loop.Start();
+            Rebug.Print("Starting bmp sensor updates...");
+            bmp280Loop.Start();
 
             Debug.Print("Flight computer boot successful.");
         }

@@ -2,7 +2,9 @@ using System;
 using System.Threading;
 using DemoSatSpring2017Netduino_OnboardSD.Drivers;
 using DemoSatSpring2017Netduino_OnboardSD.Flight_Computer;
+using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
+using Math = System.Math;
 
 namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items {
     public class PressureTempAltitudeUpdater {
@@ -43,7 +45,9 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items {
             var pressure = _bmpSensor.GetPressure();
             var temp = _bmpSensor.GetTemperature() * _precision; //precision because 4 sig figs go into decimals.
             var altitude = Bmp280.PressureToAltitude(Bmp280.SensorsPressureSealevelhpa, pressure, temp);
-
+            Debug.Print("Pres: " + _bmpSensor.GetPressure());
+            Debug.Print("Temp: " + _bmpSensor.GetTemperature());
+            Debug.Print("Alt: " + _bmpSensor.GetCurrentAltitude());
             //add pressure to data array (8 bytes)
             var pressureBytes = BitConverter.GetBytes(pressure);
             for (int i = 0; i < 8; i++) {

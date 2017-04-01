@@ -15,9 +15,9 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
         private readonly int _metaDataCount = 2;
         private readonly int _timeDataCount = 3;
         private readonly int _delay;
-        public BatteryStateUpdater(I2CBus bus, int delay = 15000)
+        public BatteryStateUpdater(int delay = 15000)
         {
-            _batterySensor = new LiPoFuelGauge(bus);
+            _batterySensor = new LiPoFuelGauge();
             _delay = delay;
             _dataArray = new byte[_dataCount + _metaDataCount + _timeDataCount];
 

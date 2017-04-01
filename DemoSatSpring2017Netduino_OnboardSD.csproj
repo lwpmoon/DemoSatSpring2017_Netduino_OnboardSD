@@ -32,6 +32,7 @@
   </PropertyGroup>
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <ItemGroup>
+    <Compile Include="Drivers\BMP180.cs" />
     <Compile Include="Drivers\BMP280.cs" />
     <Compile Include="Drivers\LiPoFuelGauge.cs" />
     <Compile Include="Drivers\TSL2591.cs" />

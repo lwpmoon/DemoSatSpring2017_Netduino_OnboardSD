@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 using Math = System.Math;
@@ -76,11 +77,11 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         private Mode _mode = Mode.Ultrahighres;
         private Bmp280CompData _bmp280Compensations;
 
-        private readonly I2CDevice.Configuration _slaveConfig;
+        private I2CDevice.Configuration _slaveConfig;
         //private I2CBus _bus;
         private const int TransactionTimeout = 1000;
 
-        public Bmp280(byte address = 0x77, Mode mode = Mode.Ultrahighres)
+        public Bmp280(byte address = 0x76, Mode mode = Mode.Ultrahighres)
         {
             //_bus = bus;
             _slaveConfig = new I2CDevice.Configuration(address, 100);
@@ -92,13 +93,22 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         }
 
         public bool Init(Mode mode) {
-            var buffer = new byte[1];
-            I2CBus.Instance.ReadRegister(_slaveConfig, (byte) Registers.ChipId, buffer, 1000);
-            if (buffer[0] != ChipId) {
-                Debug.Print("Nope.");
-                return false;
-            }
-            Debug.Print("Yep!");
+
+            //for (int i = 10; i < 500; i += 10)
+            //{
+                _slaveConfig = new I2CDevice.Configuration(0x77, 100);
+                Thread.Sleep(100);
+                var buffer = new byte[1];
+                I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.ChipId, buffer, 1000);
+                if (buffer[0] != ChipId)
+                {
+                    Debug.Print("Nope for clockrate of " + 100);
+                    return false;
+                }
+                Debug.Print("BMP 280 Initialized.");
+                
+            //}
+            
 
             //if ((mode > Mode.Ultrahighres) || (mode < Mode.Ultralowpower))
             //    _mode = Mode.Standard;
@@ -107,7 +117,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
             //byte[] whoami = { 0 };
 
-            //I2CBus.Instance.WriteRead(_slaveConfig, new [] {(byte)Registers.ChipId}, whoami, TransactionTimeout);
+            //I2CBus.GetInstance.WriteRead(_slaveConfig, new [] {(byte)Registers.ChipId}, whoami, TransactionTimeout);
             ////_bus.WriteRead(_slaveConfig, new[] { (byte)Registers.ChipId }, whoami, TransactionTimeout);
 
             //if (whoami[0] != 0x58) return false;
@@ -124,51 +134,51 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
             var buffer = new byte[2];
 
-            I2CBus.Instance.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigT1 }, buffer, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.CompDigT1, buffer, TransactionTimeout);
             //_bus.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigT1 }, buffer, TransactionTimeout);
             _bmp280Compensations.DigT1 = (ushort)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.Instance.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigT2 }, buffer, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig,(byte)Registers.CompDigT2 , buffer, TransactionTimeout);
             //_bus.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigT2 }, buffer, TransactionTimeout);
             _bmp280Compensations.DigT2 = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.Instance.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigT3 }, buffer, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.CompDigT3 , buffer, TransactionTimeout);
             //_bus.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigT3 }, buffer, TransactionTimeout);
             _bmp280Compensations.DigT3 = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.Instance.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP1 }, buffer, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.CompDigP1 , buffer, TransactionTimeout);
             //_bus.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP1 }, buffer, TransactionTimeout);
             _bmp280Compensations.DigP1 = (ushort)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.Instance.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP2 }, buffer, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.CompDigP2 , buffer, TransactionTimeout);
             //_bus.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP2 }, buffer, TransactionTimeout);
             _bmp280Compensations.DigP2 = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.Instance.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP3 }, buffer, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.CompDigP3 , buffer, TransactionTimeout);
             //_bus.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP3 }, buffer, TransactionTimeout);
             _bmp280Compensations.DigP3 = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.Instance.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP4 }, buffer, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.CompDigP4 , buffer, TransactionTimeout);
             //_bus.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP4 }, buffer, TransactionTimeout);
             _bmp280Compensations.DigP4 = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.Instance.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP5 }, buffer, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.CompDigP5 , buffer, TransactionTimeout);
             //_bus.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP5 }, buffer, TransactionTimeout);
             _bmp280Compensations.DigP5 = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.Instance.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP6 }, buffer, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.CompDigP6 , buffer, TransactionTimeout);
             //_bus.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP6 }, buffer, TransactionTimeout);
             _bmp280Compensations.DigP6 = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.Instance.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP7 }, buffer, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.CompDigP7 , buffer, TransactionTimeout);
             //_bus.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP7 }, buffer, TransactionTimeout);
             _bmp280Compensations.DigP7 = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.Instance.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP8 }, buffer, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.CompDigP8 , buffer, TransactionTimeout);
             //_bus.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP8 }, buffer, TransactionTimeout);
             _bmp280Compensations.DigP8 = (short)((buffer[0] << 8) | buffer[1]);
 
-            I2CBus.Instance.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP9 }, buffer, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.CompDigP9 , buffer, TransactionTimeout);
             //_bus.WriteRead(_slaveConfig, new[] { (byte)Registers.CompDigP9 }, buffer, TransactionTimeout);
             _bmp280Compensations.DigP9 = (short)((buffer[0] << 8) | buffer[1]);
         }
@@ -177,7 +187,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         {
             var tempBuffer = new byte[3];
             
-            I2CBus.Instance.WriteRead(_slaveConfig, new []{(byte) Registers.TempData}, tempBuffer, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte) Registers.TempData, tempBuffer, TransactionTimeout);
             //_bus.WriteRead(_slaveConfig, new []{(byte) Registers.TempData}, tempBuffer, TransactionTimeout);
         
             return (((tempBuffer[0] << 8) + tempBuffer[1]) << 4) + (tempBuffer[2] >> 14);
@@ -188,7 +198,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         {
             var pressureBuffer = new byte[3];
 
-            I2CBus.Instance.WriteRead(_slaveConfig,new [] {(byte) Registers.PressureData}, pressureBuffer, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte) Registers.PressureData, pressureBuffer, TransactionTimeout);
             //_bus.WriteRead(_slaveConfig,new [] {(byte) Registers.PressureData}, pressureBuffer, TransactionTimeout);
             return pressureBuffer;
         }

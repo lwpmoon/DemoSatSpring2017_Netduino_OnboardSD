@@ -6,15 +6,13 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 {
     class LiPoFuelGauge
     {
-        private I2CBus _bus;
         private readonly I2CDevice.Configuration _slaveConfig;
         private const int TransactionTimeout = 1000;
         private const int ClockSpeed = Program.I2CclockSpeed;
 
 
-        public LiPoFuelGauge(I2CBus bus, byte address = (byte) Registers.Max17043Address)
+        public LiPoFuelGauge(byte address = (byte) Registers.Max17043Address)
         {
-            _bus = bus;
             _slaveConfig = new I2CDevice.Configuration(address, ClockSpeed);
         }
 
@@ -22,7 +20,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         {
             byte[] data = new byte[2];
             
-            _bus.ReadRegister(_slaveConfig, (byte) Registers.Soc, data, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte) Registers.Soc, data, TransactionTimeout);
             byte msb = data[0];
             byte lsb = data[1];
             var value = (msb << 4) | (lsb >> 4);
@@ -36,7 +34,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         {
             byte[] data = new byte[2];
 
-            _bus.ReadRegister(_slaveConfig, (byte)Registers.Soc, data, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.Soc, data, TransactionTimeout);
             byte msb = data[0];
             byte lsb = data[1];
 
@@ -71,7 +69,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             byte[] data = new byte[2];
             data[0] = 0x00;
             data[1] = 0x54;
-            _bus.WriteRegister(_slaveConfig, (byte)Registers.Mode, data, TransactionTimeout);
+            I2CBus.Instance.WriteRegister(_slaveConfig, (byte)Registers.Mode, data, TransactionTimeout);
         }
 
         /// <summary>
@@ -82,7 +80,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             byte[] data = new byte[2];
             data[0] = 0x40;
             data[1] = 0x00;
-            _bus.WriteRegister(_slaveConfig, (byte) Registers.Mode, data, TransactionTimeout);
+            I2CBus.Instance.WriteRegister(_slaveConfig, (byte) Registers.Mode, data, TransactionTimeout);
         }
         /// <summary>
         /// Reads current configuration of fuel-gauge
@@ -93,7 +91,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         {
             if (msb != 0 || lsb != 0)throw new ApplicationException("Ref msb or lsb values were not 0 as expectd...");
             byte[] data = new byte[2];
-            _bus.ReadRegister(_slaveConfig, (byte) Registers.Config, data, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte) Registers.Config, data, TransactionTimeout);
             msb = data[0];
             lsb = data[1];
         }
