@@ -18,6 +18,9 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items {
         private readonly int _delay;
         private readonly int _precision;
 
+        //Default value provided by the Adafruit library. Update the day of launch for accuracy.
+        public const float seaLevelhPa = (float)1013.25;//Todo: Update this the morning of launch!!!
+
         public PressureTempAltitudeUpdater(int sigFigs = 4, int delay = 30000) {
             _bmpSensor = new Bmp280();
             _dataArray = new byte[_dataCount + _metaDataCount + _timeDataCount];
@@ -27,7 +30,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items {
             _delay = delay;
             _precision = (int) Math.Pow(10, sigFigs - 1);
 
-            _workItem = new WorkItem(BmpUpdater, ref _dataArray, true, true, true);
+            _workItem = new WorkItem(BmpUpdater, ref _dataArray, false, true, true);
 
             //_bmpSensor.Init(); Extraneous???
         }
@@ -42,12 +45,17 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items {
             _dataArray[dataIndex++] = time[1];
             _dataArray[dataIndex++] = time[2];
 
-            var pressure = _bmpSensor.GetPressure();
-            var temp = _bmpSensor.GetTemperature() * _precision; //precision because 4 sig figs go into decimals.
-            var altitude = Bmp280.PressureToAltitude(Bmp280.SensorsPressureSealevelhpa, pressure, temp);
-            Debug.Print("Pres: " + _bmpSensor.GetPressure());
-            Debug.Print("Temp: " + _bmpSensor.GetTemperature());
-            Debug.Print("Alt: " + _bmpSensor.GetCurrentAltitude());
+            var pressure = _bmpSensor.readPressure();
+            var temp = _bmpSensor.readTemperature();// * _precision; //precision because 4 sig figs go into decimals.
+            var altitude = _bmpSensor.readAltitude(seaLevelhPa);
+
+            Debug.Print("Pres: " + pressure + " Pa");//Should be ~82,000 Pascal...
+            Debug.Print("Temp: " + temp + " *C");//Should be ~20 Celsius...
+            Debug.Print("Alt: " + altitude + " m");//Should be ~1760 meters...
+            
+
+            //Commented out the logger logic to prevent breaking when passing unexpected values to the daa array.
+            /*
             //add pressure to data array (8 bytes)
             var pressureBytes = BitConverter.GetBytes(pressure);
             for (int i = 0; i < 8; i++) {
@@ -66,6 +74,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items {
             _dataArray[dataIndex] = (byte)((short)altitude & 0xFF);
 
             Array.Copy(_dataArray, _workItem.PacketData, _dataArray.Length);
+            */
             Thread.Sleep(_delay);
         }
 

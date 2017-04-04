@@ -6,6 +6,8 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items {
         BnoDump = 0x02,
         TimeSync = 0x03,
         DebugMessage = 0x04,
-        EMagDump = 0x05
+        EMagDump = 0x05,
+        BatDump = 0x06,
+        HeatDump = 0x07
     }
 }

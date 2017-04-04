@@ -4,7 +4,7 @@ using Microsoft.SPOT.Hardware;
 
 namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 {
-    class LiPoFuelGauge
+    public class LiPoFuelGauge
     {
         private readonly I2CDevice.Configuration _slaveConfig;
         private const int TransactionTimeout = 1000;
@@ -15,22 +15,29 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         {
             _slaveConfig = new I2CDevice.Configuration(address, ClockSpeed);
         }
+        
 
-        public double GetVCell()
+
+
+        /// <summary>
+        /// Returns current voltage of the system battery
+        /// </summary>
+        /// <returns>double Voltage</returns>
+        public float GetVCell()
         {
             byte[] data = new byte[2];
             
-            I2CBus.Instance.ReadRegister(_slaveConfig, (byte) Registers.Soc, data, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte) Registers.Vcell, data, TransactionTimeout);
             byte msb = data[0];
             byte lsb = data[1];
             var value = (msb << 4) | (lsb >> 4);
             
-            return Tools.map(value, 0x000, 0xFFF, 0, 50000) / 10000.0;
+            return (float)(Tools.map(value, 0x000, 0xFFF, 0, 50000) / 10000.0);
             
             //return value * 0.00125;
         }
 
-        public double GetSoC()
+        public ushort GetSOC()
         {
             byte[] data = new byte[2];
 
@@ -39,20 +46,23 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             byte lsb = data[1];
 
             double holder  = lsb / 256.0;
-            return msb + holder;
+            return (ushort)(msb + holder);
         }
 
-        int GetVersion()
+        /// <summary>
+        ///Returns the current version of the IC.
+        /// This should return "3"
+        /// </summary>
+        /// <returns>int 3</returns>
+        public int GetVersion()
         {
-            byte msb = 0;
-            byte lsb = 0;
+            byte[] data = new byte[2];
+            I2CBus.Instance.ReadRegister(_slaveConfig,(byte)Registers.Version, data, TransactionTimeout);
 
-            //readRegister(VERSION_REGISTER, MSB, LSB);
-
-            return (msb << 8) | lsb;
+            return (data[0] << 8) | data[1];
         }
 
-        byte GetCompensateValue()
+        private byte GetCompensateValue()
         {
             byte msb = 0;
             byte lsb = 0;
@@ -64,7 +74,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         /// <summary>
         /// Reset as if power had been removed.
         /// </summary>
-        void Reset()
+        public void Reset()
         {
             byte[] data = new byte[2];
             data[0] = 0x00;
@@ -75,7 +85,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         /// <summary>
         /// Restart fuel-gauge calculations.
         /// </summary>
-        void QuickStart()
+        public void QuickStart()
         {
             byte[] data = new byte[2];
             data[0] = 0x40;
@@ -87,7 +97,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         /// </summary>
         /// <param name="msb"></param>
         /// <param name="lsb"></param>
-        void ReadConfigRegister(ref byte msb, ref byte lsb)
+        private void ReadConfigRegister(ref byte msb, ref byte lsb)
         {
             if (msb != 0 || lsb != 0)throw new ApplicationException("Ref msb or lsb values were not 0 as expectd...");
             byte[] data = new byte[2];

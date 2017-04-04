@@ -12,6 +12,8 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
         private const double Tolerance = 0.005;
 
+        private int i = 0;
+
         // private TestServo servo = null;
         private readonly WorkItem _trackAction;
         private readonly ContServo _panServo;
@@ -109,6 +111,17 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             _currentHeading = _bno.read_vector(SerialBno.Bno055VectorType.VectorEuler);
             _degreesToMove = GetHeadingError(_zeroPointHeading.X, _currentHeading.X);
             _panServo.Recover(_degreesToMove);
+
+            //if (i == 0)
+            //{
+            //    _panServo.Recover(180);
+            //    i = 1;
+            //}
+            //else
+            //{
+            //    _panServo.Recover(0);
+            //    i = 0;
+            //}
 
         }
         

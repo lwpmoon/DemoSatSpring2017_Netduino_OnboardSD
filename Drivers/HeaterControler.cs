@@ -15,30 +15,21 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
        
         private readonly AnalogInput _tempSensor;
         private readonly AnalogInput _heaterSensor;
-        
+
         public HeaterControler()
         {
-            _tempSensor = new AnalogInput(Cpu.AnalogChannel.ANALOG_0);
-            _heaterSensor = new AnalogInput(Cpu.AnalogChannel.ANALOG_1);
-            _heaterControlPin = new PWM(PWMChannels.PWM_PIN_D10,1000, 0, false);
+            _tempSensor = new AnalogInput(Cpu.AnalogChannel.ANALOG_1);
+            _heaterSensor = new AnalogInput(Cpu.AnalogChannel.ANALOG_0);
+            _heaterControlPin = new PWM(PWMChannels.PWM_PIN_D10, 1000, 0, false);
             _heaterControlPin.Start();
         }
 
-        public void Update()
-        {
-            var heaterTemp = GetHeaterTemp();
-            var temperature = GetTemp();
-
-            SetHeater(temperature, heaterTemp);
-
-            Rebug.Print("Heater heaterTemp: " + heaterTemp);
-            Rebug.Print("Internal Temp: " + temperature);
-            ////Debug.Print("Heater heaterTemp: " + heaterTemp);
-            //Debug.Print("Internal Temp: " + temperature);
-        }
-
-
-        private double GetTemp()
+        /// <summary>
+        /// Returns the current tempurature of the payload
+        /// Use to set the required heater power
+        /// </summary>
+        /// <returns></returns>
+        public short GetTemp()
         {
             var i = 0;
             double readings = 0;
@@ -49,12 +40,17 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             }
             var voltage = (readings / 20) * 3.3;
             var tempC = (voltage - 0.5) * 100;
-            var tempF = (tempC * 1.8) + 32;
+            //var tempF = (tempC * 1.8) + 32;
 
-            return tempF;
+            return (short)tempC;
         }
 
-        private double GetHeaterTemp()
+        /// <summary>
+        /// Returns the current tempurature of the heating element
+        /// Use to prevent over heating the payload
+        /// </summary>
+        /// <returns></returns>
+        public short GetHeaterTemp()
         {
             var i = 0;
             double readings = 0;
@@ -65,25 +61,29 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             }
             var voltage = (readings / 20) * 3.3;
             var tempC = (voltage - 0.5) * 100;
-            var tempF = (tempC * 1.8) + 32;
+            //var tempF = (tempC * 1.8) + 32;
 
-            return tempF;
+            return (short)tempC;
         }
 
         
-
-        private void SetHeater(double temperature, double heaterTemp)
+        /// <summary>
+        /// Sets the heater power level based on payload and heater temperature
+        /// </summary>
+        /// <param name="temperature"></param>
+        /// <param name="heaterTemp"></param>
+        public void SetHeater(short temperature, short heaterTemp)
         {
             double power = 0;
 
             if (heaterTemp <= 120)
             {
-                if (temperature >= 75) power = 0;
-                if (temperature < 75 && temperature >= 73) power = 0.2;
-                if (temperature < 73 && temperature >= 65) power = 0.4;
-                if (temperature < 65 && temperature >= 50) power = 0.6;
-                if (temperature < 50 && temperature >= 30) power = 0.8;
-                if (temperature < 30 && temperature >= 0) power = 1; 
+                if (temperature >= 25) power = 0;
+                if (temperature < 25 && temperature >= 23) power = 0.2;
+                if (temperature < 23 && temperature >= 20) power = 0.4;
+                if (temperature < 20 && temperature >= 18) power = 0.6;
+                if (temperature < 18 && temperature >= 15) power = 0.8;
+                if (temperature < 15 && temperature >= 0) power = 1; 
             }
 
             _heaterControlPin.DutyCycle = power;

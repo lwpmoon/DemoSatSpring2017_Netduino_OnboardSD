@@ -44,6 +44,7 @@
     <Compile Include="Drivers\LightTracker.cs" />
     <Compile Include="Drivers\Servo.cs" />
     <Compile Include="Work Items\HeaterUpdater.cs" />
+    <Compile Include="Work Items\LightSensorUpdater.cs" />
     <Compile Include="Work Items\MemoryMonitor.cs" />
     <Compile Include="Utility\PacketType.cs" />
     <Compile Include="Work Items\PressureTempAltitudeUpdater.cs" />
