@@ -1,4 +1,5 @@
 using System;
+using DemoSatSpring2017Netduino_OnboardSD.Work_Items;
 
 namespace DemoSatSpring2017Netduino_OnboardSD.Flight_Computer
 {
@@ -20,6 +21,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Flight_Computer
         public void Start() {
             lock(locker)
                 _mStartTicks = Microsoft.SPOT.Hardware.Utility.GetMachineTime().Ticks; 
+            Rebug.Print("[SUCCESS] Clock started.");
         }
         
         public long ElapsedMilliseconds {

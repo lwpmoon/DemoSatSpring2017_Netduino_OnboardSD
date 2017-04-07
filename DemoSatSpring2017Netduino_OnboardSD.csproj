@@ -41,7 +41,7 @@
     <Compile Include="Drivers\HeaterControler.cs" />
     <Compile Include="Drivers\SerialBNO.cs" />
     <Compile Include="Drivers\I2CBus.cs" />
-    <Compile Include="Drivers\LightTracker.cs" />
+    <Compile Include="Work Items\LightTracker.cs" />
     <Compile Include="Drivers\Servo.cs" />
     <Compile Include="Work Items\HeaterUpdater.cs" />
     <Compile Include="Work Items\LightSensorUpdater.cs" />

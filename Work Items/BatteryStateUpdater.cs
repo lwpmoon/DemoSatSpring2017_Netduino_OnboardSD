@@ -12,7 +12,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
         private readonly LiPoFuelGauge _batterySensor;
         private readonly WorkItem _workItem;
         private readonly byte[] _dataArray;
-        private readonly int _dataCount = 7; //3 + 2 + 2 Todo: Confirm data
+        private readonly int _dataCount = 10; //8 + 2
         private readonly int _metaDataCount = 2;
         private readonly int _timeDataCount = 3;
         private readonly int _delay;
@@ -25,18 +25,22 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
             _dataArray[1] = (byte)PacketType.BatDump;
             _workItem = new WorkItem(BatteryUpdater, ref _dataArray, true, true, true);
 
+
+
             while (!Init())
             {
 
-                Rebug.Print("MAX17043 (LiPoFuelGauge) sensor not detected...");
+                Rebug.Print("[FAILURE] MAX17043 (LiPoFuelGauge) sensor not detected...");
+                Thread.Sleep(500);
             }
 
             _batterySensor.QuickStart();
-            Rebug.Print("MAX17043 (LiPoFuelGauge) Initialized.");
+            Rebug.Print("[SUCCESS] MAX17043 (LiPoFuelGauge) initialized.");
         }
 
         public bool Init()
         {
+            Thread.Sleep(500);
             var version = _batterySensor.GetVersion();
             return (version == 3);
         }
@@ -46,24 +50,28 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
             var dataIndex = _metaDataCount;
 
             var time = BitConverter.GetBytes(Clock.Instance.ElapsedMilliseconds);
-            var voltage = _batterySensor.GetVCell();
-            var percent = _batterySensor.GetSOC();
+            double voltage = _batterySensor.GetVCell();
+            double percent = _batterySensor.GetSOC();
 
-            //Debug.Print("BatteryState...");
-            //Debug.Print("Voltage: " + voltage);
-            //Debug.Print("Percent: " + percent);
+
+            //Rebug.Print("Battery state: V:" + voltage + ", P:" + percent);
 
             _dataArray[dataIndex++] = time[0];
             _dataArray[dataIndex++] = time[1];
             _dataArray[dataIndex++] = time[2];
 
             //add battery voltage data (can be unsigned, less than 65536) (2 bytes)
-            voltage = (ushort)voltage;
-            _dataArray[dataIndex++] = (byte)(((short)voltage >> 8) & 0xFF);
-            _dataArray[dataIndex] = (byte)((short)voltage & 0xFF);
+            var voltageBytes = BitConverter.GetBytes(voltage);
+            for (int i = 0; i < 8; i++) {
+                _dataArray[dataIndex++] = voltageBytes[i];
+            }
+
+
+            //voltage = (ushort)voltage;
+            //_dataArray[dataIndex++] = (byte)(((short)voltage >> 8) & 0xFF);
+            //_dataArray[dataIndex++] = (byte)((short)voltage & 0xFF);
 
             //add battery percent remaining data (can be unsigned, less than 65536) (2 bytes)
-            percent = (ushort)percent;
             _dataArray[dataIndex++] = (byte)(((short)percent >> 8) & 0xFF);
             _dataArray[dataIndex] = (byte)((short)percent & 0xFF);
 
@@ -74,6 +82,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
         public void Start()
         {
             _workItem.Start();
+            Rebug.Print("[SUCCESS] MAX17043 (LiPoFuelGauge) started.");
         }
     }
 }

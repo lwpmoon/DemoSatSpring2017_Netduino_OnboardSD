@@ -25,7 +25,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Flight_Computer {
                 }
                 //if we have less ThreadWorkers working than our MaxThreads, go ahead and spin one up.
                 if (AvailableThreads.Count < MaxThreads) {
-                    Debug.Print("Threadpool spooling up additional thread...");
+                    Debug.Print("[INFO] Threadpool spooling up additional thread...");
                     var thread = new Thread(ThreadWorker);
                     AvailableThreads.Add(thread);
                     thread.Start();
@@ -71,8 +71,8 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Flight_Computer {
                 }
                 catch (Exception e)
                 {
-                    Rebug.Print("ThreadPool: Unhandled error executing action - " + e.Message + e.InnerException);
-                    Rebug.Print("StackTrace: " + e.StackTrace);
+                    Rebug.Print("[FAILURE] ThreadPool: Unhandled error executing action - " + e.Message + e.InnerException);
+                    Rebug.Print("[FAILURE] StackTrace: " + e.StackTrace);
                     //maybe just reset the flight computer?
                 }
             }

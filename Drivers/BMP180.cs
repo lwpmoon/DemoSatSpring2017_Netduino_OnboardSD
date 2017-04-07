@@ -4,7 +4,6 @@ using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 using Math = System.Math;
 
-
 // define for sanity check
 
 namespace DemoSatSpring2017Netduino_OnboardSD.Drivers

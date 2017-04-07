@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 using Math = System.Math;
@@ -12,7 +11,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
     /// </summary>
     public class Bmp280
     {
-        private const byte BMP280_Address = 0x77;
+        private const byte Bmp280Address = 0x77;
 
         public const byte ChipId = 0x58;
 
@@ -34,15 +33,15 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             CompDigP9 = 0x9E,
 
             ChipId = 0xD0,
-            Version = 0xD1,
-            SoftReset = 0xE0,
+            //Version = 0xD1,
+            //SoftReset = 0xE0,
 
-            Cal26 = 0xE1,
+            //Cal26 = 0xE1,
 
             Control = 0xF4,
-            Config = 0xF5,
-            PressureData = 0xF7,
-            TempData = 0xFA
+            //Config = 0xF5,
+            PressureData = 0xF7
+            //TempData = 0xFA
         }
 
         //Mode now irrelevant
@@ -89,21 +88,25 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
         private const int TransactionTimeout = 1000;
 
-        private int t_fine;
+        private int _tFine;
+        private readonly byte _address;
+        private readonly float _seaLevelhp;
 
-        public Bmp280(byte address = BMP280_Address, Mode mode = Mode.Ultrahighres)
-        {
+        public Bmp280(float seaLevelhp, byte address = Bmp280Address, Mode mode = Mode.Ultrahighres) {
+            _seaLevelhp = seaLevelhp;
+            _address = address;
             while (!Init(mode))
             {
 
-                Debug.Print("BMP280 sensor not detected...");
+                Debug.Print("[FAILURE] BMP280 sensor not detected...");
+                Thread.Sleep(500);
             }
-            Debug.Print("BMP280 Initialized.");
+            Debug.Print("[SUCCESS] BMP280 Initialized.");
         }
 
         public bool Init(Mode mode)
         {
-            _slaveConfig = new I2CDevice.Configuration(BMP280_Address, 100);
+            _slaveConfig = new I2CDevice.Configuration(_address, 100);
             //Thread.Sleep(100);
 
             var buffer = new byte[1];
@@ -112,7 +115,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
             if (buffer[0] != ChipId)return false;
             
-
+            //Thread.Sleep(500);
             ReadCoefficients();
 
             //This doesn't affect any of the values we are getting back. Still not sure what it does.
@@ -124,11 +127,11 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         //Logic is sound but not pulling correct data back. Problem lies within...
         private void ReadCoefficients()
         {
-            _bmp280Compensations.DigT1 = read16_LE((byte) Registers.CompDigT1);
+            _bmp280Compensations.DigT1 = (ushort) readS16_LE((byte) Registers.CompDigT1);
             _bmp280Compensations.DigT2 = readS16_LE((byte) Registers.CompDigT2);
             _bmp280Compensations.DigT3 = readS16_LE((byte) Registers.CompDigT3);
 
-            _bmp280Compensations.DigP1 = read16_LE((byte)Registers.CompDigP1);
+            _bmp280Compensations.DigP1 = (ushort) readS16_LE((byte)Registers.CompDigP1);
             _bmp280Compensations.DigP2 = readS16_LE((byte)Registers.CompDigP2);
             _bmp280Compensations.DigP3 = readS16_LE((byte)Registers.CompDigP3);
             _bmp280Compensations.DigP4 = readS16_LE((byte)Registers.CompDigP4);
@@ -139,13 +142,33 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             _bmp280Compensations.DigP9 = readS16_LE((byte)Registers.CompDigP9);
         }
 
+        public void UpdateMeasurements() {
+
+            var rawData = new byte[6];
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Registers.PressureData, rawData, 1000);
+
+            var adcP = (rawData[0] << 12) | (rawData[1] << 4) | (rawData[2] >> 4);
+            var adcT = (rawData[3] << 12) | (rawData[4] << 4) | (rawData[5] >> 4);
+
+            Temp = CompensateTemp(adcT);
+            Pressure = CompensatePressure(adcP);
+            Altitude = UpdateAltitude(_seaLevelhp);
+
+        }
+
+        public double Altitude { get; private set; }
+
+        public double Pressure { get; private set; }
+
+        public double Temp { get; private set; }
 
         /// <summary>
         /// Function to return Tempurature in DegC. Output value of “5123” equals 51.23 DegC.
         /// </summary>
         /// <returns>Returns temperature in DegC with resolution of 0.01 DegC</returns>
-        public float readTemperature()
+        private float CompensateTemp(int adcT)
         {
+            #region Unused JDC
             #region Data Sheet V2
             //uint var1, var2, T;
 
@@ -179,27 +202,22 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
             #endregion
 
+            #endregion
 
-            #region Adafruit
-            //Math checks out. temp data is wrong
+            #region Works - accurate temp reading.
 
-            //int adc_T = (int)read24((byte)Registers.TempData);
-            int adc_T = (int)read24((byte)Registers.TempData);
-            adc_T >>= 4;
 
-            int var1 = ((((adc_T >> 3) - ((int) _bmp280Compensations.DigT1 << 1))) * ((int) _bmp280Compensations.DigT2)) >> 11;
+            var newVar1 = (adcT / 16384.0 - _bmp280Compensations.DigT1 / 1024.0) * _bmp280Compensations.DigT2;
 
-            int var2 = (((((adc_T >> 4) - ((int) _bmp280Compensations.DigT1)) *
-                          ((adc_T >> 4) - ((int) _bmp280Compensations.DigT1))) >> 12) *
-                        ((int) _bmp280Compensations.DigT3)) >> 14;
+            var newVar2 = ((adcT / 131072.0 - _bmp280Compensations.DigT1 / 8192.0) *
+                         (adcT / 131072.0 - _bmp280Compensations.DigT1 / 8192.0)) *
+                         _bmp280Compensations.DigT3;
 
-            t_fine = var1 + var2;
-
-            float T = (t_fine * 5 + 128) >> 8;
-
-            return T/100;
+            _tFine = (int)(newVar1 + newVar2);
+            return (float)(_tFine / 5120.0);
 
             #endregion
+
         }
 
         /// <summary>
@@ -207,68 +225,31 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         /// Output value of “24674867” represents 24674867/256 = 96386.2 Pa = 963.862 hPa
         /// </summary>
         /// <returns></returns>
-        public float readPressure()
+        private float CompensatePressure(int adcP)
         {
-            #region Old
-            //var t_fine = GetTemperature() * 5120.0;
-            //var pressureBuffer = ReadRawPressure();
+           
+            var var1 = (_tFine / 2.0) - 64000.0;
+            var var2 = var1 * var1 * _bmp280Compensations.DigP6 / 32768.0;
+            var2 = var2 + var1 * _bmp280Compensations.DigP5 * 2.0;
+            var2 = (var2 / 4.0) + (_bmp280Compensations.DigP4 * 65536.0);
+            var1 = (_bmp280Compensations.DigP3 * var1 * var1 / 524288.0 +
+                    _bmp280Compensations.DigP2 * var1) / 524288.0;
+            var1 = (1.0 + var1 / 32768.0) * _bmp280Compensations.DigP1;
 
-            //var adcP1 = (byte) pressureBuffer[0];
-            //var adcP2 = (byte) pressureBuffer[1];
-            //var adcP3 = (byte) pressureBuffer[2];
-            //var P = (((adcP1 << 8) + adcP2) << 4) + (adcP3 >> 14);
-            //var Pd = (double)P;
-
-            //var var1 = ((double)t_fine / 2.0) - 64000.0;
-            //var var2 = var1 * var1 * ((double)_bmp280Compensations.DigP6) / 32768.0;
-            //var2 = var2 + var1 * ((double)_bmp280Compensations.DigP5) * 2.0;
-            //var2 = (var2 / 4.0) + (((double)_bmp280Compensations.DigP4) * 65536.0);
-            //var1 = (((double) _bmp280Compensations.DigP3)*var1*var1/524288.0 +
-            //        ((double) _bmp280Compensations.DigP2)*var1)/524288.0;
-            //var1 = (1.0 + var1 / 32768.0) * ((double)_bmp280Compensations.DigP1);
-
-            ////Avoid exception caused by division by zero
-            //if (var1 == 0.0)
-            //{
-            //    return 0;
-            //}
-
-            //var p = 1048576.0 - Pd;
-            //p = (p - (var2 / 4096.0)) * 6250.0 / var1;
-            //var1 = ((double)_bmp280Compensations.DigP9) * p * p / 2147483648.0;
-            //var2 = p * ((double)_bmp280Compensations.DigP8) / 32768.0;
-            //p = p + (var1 + var2 + ((double)_bmp280Compensations.DigP7)) / 16.0;
-            //return p; 
-            #endregion
-
-            long var1, var2, p;
-
-            // Must be done first to get the t_fine variable set up
-            readTemperature();
-
-            int adc_P = (int)read24((byte)Registers.PressureData);
-            adc_P >>= 4;
-
-            var1 = ((long)t_fine) - 128000;
-            var2 = var1 * var1 * (long)_bmp280Compensations.DigP6;
-            var2 = var2 + ((var1 * (long)_bmp280Compensations.DigP5) << 17);
-            var2 = var2 + (((long)_bmp280Compensations.DigP4) << 35);
-            var1 = ((var1 * var1 * (long)_bmp280Compensations.DigP3) >> 8) +
-              ((var1 * (long)_bmp280Compensations.DigP2) << 12);
-            var1 = (((((long)1) << 47) + var1)) * ((long)_bmp280Compensations.DigP1) >> 33;
-
-            if (var1 == 0)
+            //Avoid exception caused by division by zero
+            if (Math.Abs(var1) < 0.01)
             {
-                return 0;  // avoid exception caused by division by zero
+                return 0;
             }
-            p = 1048576 - adc_P;
-            p = (((p << 31) - var2) * 3125) / var1;
-            var1 = (((long)_bmp280Compensations.DigP9) * (p >> 13) * (p >> 13)) >> 25;
-            var2 = (((long)_bmp280Compensations.DigP8) * p) >> 19;
 
-            p = ((p + var1 + var2) >> 8) + (((long)_bmp280Compensations.DigP7) << 4);
-            return (float)p / 256;
+            var p = 1048576.0 - adcP;
+            p = (p - (var2 / 4096.0)) * 6250.0 / var1;
+            var1 = _bmp280Compensations.DigP9 * p * p / 2147483648.0;
+            var2 = p * _bmp280Compensations.DigP8 / 32768.0;
+            p = p + (var1 + var2 + _bmp280Compensations.DigP7) / 16.0;
+            return (float) p; 
 
+           
         }
 
         //Math checks out. Altitude data is wrong. Problem not here...
@@ -277,16 +258,13 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         /// </summary>
         /// <param name="seaLevelhPa">Sea Level compensation to be set the morning of launch</param>
         /// <returns>Altitude in (meters)</returns>
-        public double readAltitude(float seaLevelhPa)
+        private double UpdateAltitude(float seaLevelhPa)
         {
-            double altitude;
+            //var pressure = compensatePressure(); // in Si units for Pascal
+            var atmospheric = Pressure / 100;
+            //return ((Math.Pow((seaLevelhPa / atmospheric), 0.190223F) - 1.0F) * (Temp + 273.15F)) / 0.0065;
+            return (44330 * (1.0 - Math.Pow(atmospheric / seaLevelhPa, 0.1903)));
 
-            float pressure = readPressure(); // in Si units for Pascal
-            pressure /= 100;
-
-            altitude = (44330 * (1.0 - Math.Pow(pressure / seaLevelhPa, 0.1903)));
-
-            return altitude;
         }
 
 
@@ -294,43 +272,39 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         //Data is not returned with the expected values.
         //All read methods use equivalent logic to the Adafruit Librarie.
 
-        private ushort read16(byte reg)
+        private ushort Read16(byte reg)
         {
-            ushort value;
-
             byte[] buffer = new byte[2];
-            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)reg, buffer, TransactionTimeout);
-            value = (ushort)((buffer[0] << 8) | buffer[1]);
+            I2CBus.Instance.ReadRegister(_slaveConfig, reg, buffer, TransactionTimeout);
+            var value = (ushort)((buffer[0] << 8) | buffer[1]);
 
             return value;
         }
 
-        private ushort read16_LE(byte reg)
-        {
-            return read16(reg);
-        }
+        //private ushort read16_LE(byte reg)
+        //{
+        //    return read16(reg);
+        //}
 
         private short readS16_LE(byte reg)
         {
-            ushort temp = read16(reg);
+            ushort temp = Read16(reg);
             return (short)((temp >> 8) | (temp << 8));
         }
 
-        private uint read24(byte reg)
-        {
-            uint value;
+        //private uint read24(byte reg)
+        //{
+        //    var buffer = new byte[3];
+        //    I2CBus.Instance.ReadRegister(_slaveConfig, (byte)reg, buffer, TransactionTimeout);
 
-            byte[] buffer = new byte[3];
-            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)reg, buffer, TransactionTimeout);
+        //    uint value = buffer[0];
+        //    value <<= 8;
+        //    value |= buffer[1];
+        //    value <<= 8;
+        //    value |= buffer[2];
 
-            value = buffer[0];
-            value <<= 8;
-            value |= buffer[1];
-            value <<= 8;
-            value |= buffer[2];
-
-            return value;
-        }
+        //    return value;
+        //} 
 
     }
 }

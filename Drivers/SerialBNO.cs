@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading;
 using DemoSatSpring2017Netduino_OnboardSD.Utility;
 using DemoSatSpring2017Netduino_OnboardSD.Work_Items;
-using Microsoft.SPOT;
 
 namespace DemoSatSpring2017Netduino_OnboardSD.Drivers {
     public class SerialBno {
@@ -19,18 +18,20 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers {
 
         public bool Begin()
         {
-            Rebug.Print("Opening BNO communications channel...");
+            Rebug.Print("[INFO] Opening BNO communications channel...");
             lock (Locker) {
                 _comPort.Open();
             }
+            Rebug.Print("[SUCCESS] BNO communications channel opened on COM1");
 
             ConfigMode();
             write_byte(Bno055Registers.Bno055PageIdAddr, 0);
 
             var bnoId = read_byte(Bno055Registers.Bno055ChipIdAddr);
-            Rebug.Print("Read chip ID for BNO055: 0x" + bnoId.ToString("x"));
+            Rebug.Print("[INFO] Validating chip ID for BNO055: 0x" + bnoId.ToString("x"));
 
             if (bnoId != Bno055Id) return false;
+            Rebug.Print("[SUCCESS] BNO055 chip ID validated.");
 
             //reset the device
             write_byte(Bno055Registers.Bno055SysTriggerAddr, 0x20, false);
@@ -46,7 +47,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers {
 
             //enter normal operation mode
             OpMode();
-
+            Rebug.Print("[SUCCESS] BNO055 initialized.");
             return true;
         }
         public byte[] GetCalibration() {
@@ -95,13 +96,13 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers {
                 var response = new byte[_comPort.BytesToRead];
                 var readCount = _comPort.Read(response, 0, response.Length);
                 //If we timed out, throw an exception.
-                if (readCount == 0) Rebug.Print("Serial ACK timeout...");
+                if (readCount == 0) Rebug.Print("[FAILURE] Serial ACK timeout...");
 
                 //if we didn't get an error code (0xEE07), we're done.
-                if (response.Length > 0 && !(response[0] == 0xEE && response[1] == 0x07)) return response;
+                if (response.Length > 1 && !(response[0] == 0xEE && response[1] == 0x07)) return response;
                 //if we tried 5 times to get a non-error ACK and didn't, throw an exception.
                 if (++tries == maxTries)
-                    throw new IOException("Exceeded max tries to acknowlege serial command without bus error.");
+                    throw new IOException("[FAILURE] Exceeded max tries to acknowlege serial command without bus error.");
 
 
                 return serial_send(command, expectedLength, maxTries: maxTries, tries: tries);
@@ -130,7 +131,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers {
 
         private void Verify(byte[] response) {
             if (response[0] != 0xEE && response[1] != 0x01)
-                throw new IOException("Error writing to register: 0x" + response);
+                throw new IOException("[FAILURE] Error writing to register: 0x" + response);
         }
 
         private string Bytearraytostring(byte[] array) {
@@ -163,7 +164,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers {
 
             var response = serial_send(command, expectedLength, ack);
 
-            if (response[0] != 0xBB) throw new IOException("Serial Read error: 0x" + Bytearraytostring(response));
+            if (response[0] != 0xBB) throw new IOException("[FAILURE] Serial Read error: 0x" + Bytearraytostring(response));
 
             var length = response[1];
             var data = new byte[length];
@@ -172,7 +173,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers {
                 data[i - 2] = response[i];
             //Debug.Print("Serial Receive: 0x" + bytearraytostring(data));
 
-            if (data.Length != length) throw new IOException("Timeout reading serial data...");
+            if (data.Length != length) throw new IOException("[FAILURE] Timeout reading serial data...");
 
             return data;
         }
@@ -196,13 +197,15 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers {
         }
 
         private void ConfigMode() {
-            Rebug.Print("BNO055 entering configuration mode...");
+            Rebug.Print("[CONFIG] BNO055 entering configuration mode...");
             SetMode(Bno055OpMode.OperationModeConfig);
+            Rebug.Print("[SUCCESS] BNO055 is in config mode.");
         }
 
         private void OpMode() {
-            Rebug.Print("BNO055 entering normal operation mode...");
+            Rebug.Print("[CONFIG] BNO055 entering normal operation mode...");
             SetMode(_mode);
+            Rebug.Print("[SUCCESS] BNO055 is in normal op mode.");
         }
 
         private void SetMode(Bno055OpMode mode)

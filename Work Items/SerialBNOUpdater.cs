@@ -36,6 +36,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items {
             _workItem = new WorkItem(OnTaskExecute, ref _dataArray, loggable:true, persistent:true, pauseable:true);
 
             _bnoSensor.Begin();
+            Rebug.Print("[SUCCESS] BNO055 update initialized.");
         }
 
         private void OnTaskExecute()
@@ -81,6 +82,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items {
 
         public void Start() {
             _workItem.Start();
+            Rebug.Print("[SUCCESS] BNO055 update started.");
         }
         
     }

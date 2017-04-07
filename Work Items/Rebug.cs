@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using DemoSatSpring2017Netduino_OnboardSD.Flight_Computer;
+using Microsoft.SPOT;
 
 namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
 {
@@ -9,8 +10,8 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
         public static int _metaDataCount = 4;
         public static int _timeDataCount = 3;
 
-        public static void Print(string what)
-        {
+        public static void Print(string what) {
+            Debug.Print(what);
             var bytes = Encoding.UTF8.GetBytes(what);
             var packet = new byte[bytes.Length + _metaDataCount + _timeDataCount];
             packet[0] = (byte) PacketType.StartByte;

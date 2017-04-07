@@ -1,11 +1,5 @@
-using System;
-using DemoSatSpring2017Netduino_OnboardSD.Flight_Computer;
-using DemoSatSpring2017Netduino_OnboardSD.Work_Items;
-using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
-using SecretLabs.NETMF.Hardware;
-using SecretLabs.NETMF.Hardware.Netduino;
-using PWMChannels = SecretLabs.NETMF.Hardware.NetduinoPlus.PWMChannels;
+using SecretLabs.NETMF.Hardware.NetduinoPlus;
 
 namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 {

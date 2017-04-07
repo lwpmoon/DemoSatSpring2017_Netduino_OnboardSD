@@ -8,6 +8,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items {
         DebugMessage = 0x04,
         EMagDump = 0x05,
         BatDump = 0x06,
-        HeatDump = 0x07
+        HeatDump = 0x07,
+        LuminosityUpdate = 0x08
     }
 }

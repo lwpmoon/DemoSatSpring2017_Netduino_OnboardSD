@@ -7,7 +7,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
     public class I2CBus : IDisposable
     {
-        private static I2CBus _instance = null;
+        private static I2CBus _instance;
         private static readonly object LockObject = new object();
 
         private static I2CBus GetInstance()
@@ -24,12 +24,12 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
         private I2CBus()
         {
-            this._slaveDevice = new I2CDevice(new I2CDevice.Configuration(0, 0));
+            _slaveDevice = new I2CDevice(new I2CDevice.Configuration(0, 0));
         }
 
         public void Dispose()
         {
-            this._slaveDevice.Dispose();
+            _slaveDevice.Dispose();
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             _slaveDevice.Config = config;
 
             // create an i2c write transaction to be sent to the device.
-            I2CDevice.I2CTransaction[] writeXAction = new I2CDevice.I2CTransaction[] { I2CDevice.CreateWriteTransaction(writeBuffer) };
+            I2CDevice.I2CTransaction[] writeXAction = { I2CDevice.CreateWriteTransaction(writeBuffer) };
 
             lock (_slaveDevice)
             {
@@ -69,7 +69,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             _slaveDevice.Config = config;
 
             // create an i2c read transaction to be sent to the device.
-            I2CDevice.I2CTransaction[] readXAction = new I2CDevice.I2CTransaction[] { I2CDevice.CreateReadTransaction(readBuffer) };
+            I2CDevice.I2CTransaction[] readXAction = { I2CDevice.CreateReadTransaction(readBuffer) };
 
             lock (_slaveDevice)
             {

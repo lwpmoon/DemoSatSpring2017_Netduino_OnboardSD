@@ -7,6 +7,7 @@ using Math = System.Math;
 
 namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
 {
+
     class HeaterUpdater
     {
         private readonly  HeaterControler _heatercontroler;
@@ -33,7 +34,8 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
             _delay = delay;
             
 
-            _workItem = new WorkItem(HeaterControl, false, true, true);
+            _workItem = new WorkItem(HeaterControl, ref _dataArray, true, true, true);
+            Rebug.Print("[SUCCESS] Heater controller initialized.");
         }
 
         private void HeaterControl()
@@ -51,13 +53,19 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
             _dataArray[dataIndex++] = time[1];
             _dataArray[dataIndex++] = time[2];
 
-            //add battery voltage data (can be unsigned, less than 65536) (2 bytes)
-            _dataArray[dataIndex++] = (byte)(((short)temperature >> 8) & 0xFF);
-            _dataArray[dataIndex] = (byte)((short)temperature & 0xFF);
+            var tempBytes = BitConverter.GetBytes(temperature);
+            //add temp data (can be unsigned, less than 65536) (2 bytes)
+            _dataArray[dataIndex++] = tempBytes[0];
+            _dataArray[dataIndex++] = tempBytes[1];
+            //_dataArray[dataIndex++] = (byte)(((short)temperature >> 8) & 0xFF);
+            //_dataArray[dataIndex] = (byte)((short)temperature & 0xFF);
 
             //add battery percent remaining data (can be unsigned, less than 65536) (2 bytes)
-            _dataArray[dataIndex++] = (byte)(((short)heaterTemp >> 8) & 0xFF);
-            _dataArray[dataIndex] = (byte)((short)heaterTemp & 0xFF);
+            var heaterTempBytes = BitConverter.GetBytes(heaterTemp);
+            _dataArray[dataIndex++] = heaterTempBytes[0];
+            _dataArray[dataIndex] = heaterTempBytes[1];
+            //_dataArray[dataIndex++] = (byte)(((short)heaterTemp >> 8) & 0xFF);
+            //_dataArray[dataIndex] = (byte)((short)heaterTemp & 0xFF);
 
             Array.Copy(_dataArray, _workItem.PacketData, _dataArray.Length);
             Thread.Sleep(_delay);
@@ -66,6 +74,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
         public void Start()
         {
             _workItem.Start();
+            Rebug.Print("[SUCCESS] Heater controller started.");
         }
     }
 }

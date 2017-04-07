@@ -1,8 +1,6 @@
-using System;
 using System.Threading;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
-using Math = System.Math;
 
 namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 {
@@ -11,7 +9,6 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         
         //This is the last priority when integrating the sensors. Not really needed...
 
-        private readonly byte _tsl2591Address = 0x29;
         //private Coefficients _coefficients;
         private bool _initialized;
         private Gain _gain;
@@ -23,26 +20,24 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         private const int ClockSpeed = Program.I2CclockSpeed;
         
 
-        //Not tested
-        public Tsl2591(byte address = 0x29, Gain gain = Gain.MED, Integrationtime inte = Integrationtime._100MS)
+        public Tsl2591(byte address = 0x29, Gain gain = Gain.Med, Integrationtime inte = Integrationtime._100MS)
         {
-            _tsl2591Address = address;
-            _slaveConfig = new I2CDevice.Configuration(_tsl2591Address, ClockSpeed);
+            _slaveConfig = new I2CDevice.Configuration(address, ClockSpeed);
             _initialized = false;
 
-            if (!Init(gain, inte))
+            while (!Init(gain, inte))
             {
 
                 Debug.Print("TSL2591 Light Sensor not detected...");
+                Thread.Sleep(500);
             }
         }
 
-        //Not tested
         public bool Init(Gain gain, Integrationtime integrationtime)
         {
             byte[] whoami = { 0 };
 
-            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Bits.COMMAND_BIT | (byte)Registers.DEVICE_ID, whoami, TransactionTimeout);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Bits.CommandBit | (byte)Registers.DeviceId, whoami, TransactionTimeout);
 
             if (whoami[0] != 0x50) return false;
 
@@ -51,15 +46,14 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             _gain = gain;
             _integration = integrationtime;
 
-            setGainAndTiming();
+            SetGainAndTiming();
 
-            
+            //EnableSensor();
 
             return true;
         }
 
-        //Refactored. Not tested
-        private void setGainAndTiming()
+        private void SetGainAndTiming()
         {
             if (!_initialized)
             {
@@ -68,17 +62,17 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
                     return;
                 }
             }
-            enable();
+            EnableSensor();
             byte[]data = new byte[2];
-            data[0] = (byte)((byte) Bits.COMMAND_BIT | (byte) Registers.CONTROL);
+            data[0] = (byte) Bits.CommandBit | (byte) Registers.Control;
             data[1] = (byte)((byte)_integration | (byte) _gain);
             //write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_CONTROL, _integration | _gain);
             I2CBus.Instance.Write(_slaveConfig, data, TransactionTimeout);
-            disable();
+            //DisableSensor();
         }
 
         //Refactored. Not tested
-        private void enable()
+        private void EnableSensor()
         {
             if (!_initialized)
             {
@@ -90,11 +84,10 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
             // Enable the device by setting the control bit to 0x01
             //I2CBus.Instance.Write(_slaveConfig,new []{ (byte)((byte)Bits.COMMAND_BIT | (byte) Registers.ENABLE | (byte) Enable.POWERON | (byte) Enable.AEN | (byte) Enable.AIEN | (byte) Enable.NPIEN)}, TransactionTimeout);
-            I2CBus.Instance.Write(_slaveConfig,new []{ (byte)((byte)Bits.COMMAND_BIT | (byte) Registers.ENABLE | (byte) Enable.POWERON | (byte) Enable.AEN | (byte) Enable.AIEN | (byte) Enable.NPIEN)}, TransactionTimeout);
+            I2CBus.Instance.Write(_slaveConfig,new []{ (byte)((byte)Bits.CommandBit | (byte) Registers.Enable | (byte) Enable.Poweron)}, TransactionTimeout);
         }
 
-        //Refactored. Not tested
-        private void disable()
+        private void DisableSensor()
         {
             if (!_initialized)
             {
@@ -104,18 +97,14 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
                 }
             }
 
-            // disable the device by setting the control bit to 0x00
+            // DisableSensor the device by setting the control bit to 0x00
             //write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE, TSL2591_ENABLE_POWEROFF);
-            //I2CBus.Instance.Write(_slaveConfig, new []{(byte)((byte) Bits.COMMAND_BIT | (byte) Registers.ENABLE | (byte) Enable.POWEROFF)}, TransactionTimeout);
+            I2CBus.Instance.Write(_slaveConfig, new []{(byte)((byte) Bits.CommandBit | (byte) Registers.Enable | (byte) Enable.Poweroff)}, TransactionTimeout);
         }
 
-        //Refactored. Not tested
         private ulong CalculateLux(ushort ch0, ushort ch1)
         {
             float atime, again;
-            float cpl, lux1, lux2, lux;
-            ulong chan0, chan1;
-
             // Check for overflow conditions first
             if ((ch0 == 0xFFFF) | (ch1 == 0xFFFF))
             {
@@ -153,16 +142,16 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
             switch (_gain)
             {
-                case Gain.LOW:
+                case Gain.Low:
                     again = 1.0F;
                     break;
-                case Gain.MED:
+                case Gain.Med:
                     again = 25.0F;
                     break;
-                case Gain.HIGH:
+                case Gain.High:
                     again = 428.0F;
                     break;
-                case Gain.MAX:
+                case Gain.Max:
                     again = 9876.0F;
                     break;
                 default:
@@ -171,11 +160,11 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             }
 
             // cpl = (ATIME * AGAIN) / DF
-            cpl = (atime*again)/ LUX_DF;//TSL2591_LUX_DF;
+            var cpl = (atime*again)/ LuxDf;
 
-            lux1 = ((float)ch0 - (LUX_COEFB * (float)ch1)) / cpl;
-            lux2 = ((LUX_COEFC * (float)ch0) - (LUX_COEFD * (float)ch1)) / cpl;
-            lux = lux1 > lux2 ? lux1 : lux2;
+            var lux1 = (ch0 - (LuxCoefb * ch1)) / cpl;
+            var lux2 = ((LuxCoefc * ch0) - (LuxCoefd * ch1)) / cpl;
+            var lux = lux1 > lux2 ? lux1 : lux2;
 
             // Alternate lux calculation
             //lux = ( (float)ch0 - ( 1.7F * (float)ch1 ) ) / cpl;
@@ -195,74 +184,83 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
                 }
             }
 
-            // Enable the device
-            enable();
+            EnableSensor();
 
-            // Wait x ms for ADC to complete
-            for (var d = 0; d <= (int)_integration; d++)
-            {
-                Thread.Sleep(120);
-            }
+            Thread.Sleep(112);
+           
+            var ch0 = new byte[2];
+            var ch1 = new byte[2];
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Bits.CommandBit | (byte)Bits.WordBit | (byte)Registers.Chan0Low, ch0, 1000);
+            I2CBus.Instance.ReadRegister(_slaveConfig, (byte)Bits.CommandBit | (byte)Bits.WordBit | (byte)Registers.Chan1Low, ch1, 1000);
+            var broadband = (ushort)((ch0[1] << 8) | ch0[0]);
+            var infrared = (ushort)((ch1[1] << 8) | ch1[0]);
 
-            byte[] writeBuffer = new byte[2];
-            byte[] readBuffer = new byte[2];
+            //DisableSensor();
 
-            writeBuffer[0] = (byte)Bits.COMMAND_BIT;
-            writeBuffer[1] = (byte)Registers.CHAN1_LOW;
-            var reg = (writeBuffer[0] | writeBuffer[1]);
+            return (uint)CalculateLux(broadband, infrared);
 
-            I2CBus.Instance.ReadRegister(_slaveConfig, (byte) reg, readBuffer, TransactionTimeout);
+            #region Unused
+            //byte[] writeBuffer = new byte[2];
+            //byte[] readBuffer = new byte[2];
 
-            uint t = readBuffer[0];
-            uint x = readBuffer[1];
-            x = (x << 8);
-            var data = (x | t);
-            
+            //writeBuffer[0] = (byte)Bits.COMMAND_BIT;
+            //writeBuffer[1] = (byte)Registers.CHAN1_LOW;
+            //var reg = (writeBuffer[0] | writeBuffer[1]);
 
-            writeBuffer[0] = (byte)Bits.COMMAND_BIT;
-            writeBuffer[1] = (byte)Registers.CHAN0_LOW;
-            reg = (byte)(writeBuffer[0] | writeBuffer[1]);
+            //I2CBus.Instance.ReadRegister(_slaveConfig, (byte) reg, readBuffer, TransactionTimeout);
 
-            I2CBus.Instance.ReadRegister(_slaveConfig, (byte) reg, readBuffer, TransactionTimeout);
+            //uint t = readBuffer[0];
+            //uint x = readBuffer[1];
+            //x = (x << 8);
+            //var data = (x | t);
 
-            //byte data2 = readBuffer[0];
 
-            t = readBuffer[0];
-            x = readBuffer[1];
-            x = (byte)(x << 8);
-            byte data2 = (byte)(x | t);
+            //writeBuffer[0] = (byte)Bits.COMMAND_BIT;
+            //writeBuffer[1] = (byte)Registers.CHAN0_LOW;
+            //reg = (byte)(writeBuffer[0] | writeBuffer[1]);
 
-            var value = (data << 16) | (data2);
+            //I2CBus.Instance.ReadRegister(_slaveConfig, (byte) reg, readBuffer, TransactionTimeout);
 
-            disable();
+            ////byte data2 = readBuffer[0];
 
-            return (uint)value;
+            //t = readBuffer[0];
+            //x = readBuffer[1];
+            //x = (byte)(x << 8);
+            //byte data2 = (byte)(x | t);
+
+            //var value = (data << 16) | (data2);
+
+            //DisableSensor();
+
+            //return (uint)value; 
+            #endregion
         }
 
+        #region Unused
         //Refactored. Not tested
-        private ushort getLuminosity(byte channel)
-        {
-            uint x = GetFullLuminosity();
+        //private ushort getLuminosity(byte channel)
+        //{
+        //    uint x = GetFullLuminosity();
 
-            if (channel == (byte)Channels.FULLSPECTRUM)
-            {
-                // Reads two byte value from channel 0 (visible + infrared)
-                return (ushort)(x & 0xFFFF);
-            }
-            else if (channel == (byte)Channels.INFRARED)
-            {
-                // Reads two byte value from channel 1 (infrared)
-                return (ushort)(x >> 16);
-            }
-            else if (channel == (byte)Channels.VISIBLE)
-            {
-                // Reads all and subtracts out just the visible!
-                return (ushort)((x & 0xFFFF) - (x >> 16));
-            }
+        //    if (channel == (byte)Channels.FULLSPECTRUM)
+        //    {
+        //        // Reads two byte value from channel 0 (visible + infrared)
+        //        return (ushort)(x & 0xFFFF);
+        //    }
+        //    else if (channel == (byte)Channels.INFRARED)
+        //    {
+        //        // Reads two byte value from channel 1 (infrared)
+        //        return (ushort)(x >> 16);
+        //    }
+        //    else if (channel == (byte)Channels.VISIBLE)
+        //    {
+        //        // Reads all and subtracts out just the visible!
+        //        return (ushort)((x & 0xFFFF) - (x >> 16));
+        //    }
 
-            // unknown channel!
-            return 0;
-        }
+        //    // unknown channel!
+        //    return 0;
+        //}
 
         //private void registerInterrupt(ushort lowerThreshold, ushort upperThreshold)
         //{
@@ -277,7 +275,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         //        }
         //    }
 
-        //    enable();
+        //    EnableSensor();
         //    //write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_THRESHOLD_NPAILTL, lowerThreshold);
         //    //write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_THRESHOLD_NPAILTH, lowerThreshold >> 8);
         //    //write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_THRESHOLD_NPAIHTL, upperThreshold);
@@ -285,7 +283,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         //    byte value = (((byte) (Bits.COMMAND_BIT) | (byte) (Registers.THRESHOLD_NPAILTH)));
         //    I2CBus.Instance.WriteRegister(_slaveConfig, (byte)value, (byte)lowerThreshold, TransactionTimeout);
 
-        //    disable();
+        //    DisableSensor();
         //}
 
         //void Adafruit_TSL2591::registerInterrupt(uint16_t lowerThreshold, uint16_t upperThreshold, tsl2591Persist_t persist)
@@ -298,51 +296,51 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         //        }
         //    }
 
-        //    enable();
+        //    EnableSensor();
         //    write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_PERSIST_FILTER, persist);
         //    write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_THRESHOLD_AILTL, lowerThreshold);
         //    write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_THRESHOLD_AILTH, lowerThreshold >> 8);
         //    write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_THRESHOLD_AIHTL, upperThreshold);
         //    write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_THRESHOLD_AIHTH, upperThreshold >> 8);
-        //    disable();
+        //    DisableSensor();
         //}
 
         //Refactored. Not tested
-        private void clearInterrupt()
-        {
-            if (!_initialized)
-            {
-                if (!(Init(_gain, _integration)))
-                {
-                    return;
-                }
-            }
+        //private void clearInterrupt()
+        //{
+        //    if (!_initialized)
+        //    {
+        //        if (!(Init(_gain, _integration)))
+        //        {
+        //            return;
+        //        }
+        //    }
 
-            enable();
-            I2CBus.Instance.Write(_slaveConfig, new []{(byte)Bits.CLEAR_INT}, TransactionTimeout );
-            disable();
-        }
+        //    //EnableSensor();
+        //    I2CBus.Instance.Write(_slaveConfig, new []{(byte)Bits.CLEAR_INT}, TransactionTimeout );
+        //    //DisableSensor();
+        //}
 
         //Refactored. Not tested
-        private byte getStatus()
-        {
-            if (!_initialized)
-            {
-                if (!(Init(_gain, _integration)))
-                {
-                    return 0;
-                }
-            }
+        //private byte getStatus()
+        //{
+        //    if (!_initialized)
+        //    {
+        //        if (!(Init(_gain, _integration)))
+        //        {
+        //            return 0;
+        //        }
+        //    }
 
-            // Enable the device
-            //enable();
-            byte[] x= new byte[1];
-            //x = read8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_DEVICE_STATUS);
-            byte value = (byte) Bits.COMMAND_BIT | (byte) Registers.DEVICE_STATUS;
-            I2CBus.Instance.ReadRegister(_slaveConfig, value, x, TransactionTimeout);
-            //disable();
-            return x[0];
-        }
+        //    // Enable the device
+        //    //EnableSensor();
+        //    byte[] x= new byte[1];
+        //    //x = read8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_DEVICE_STATUS);
+        //    byte value = (byte) Bits.COMMAND_BIT | (byte) Registers.DEVICE_STATUS;
+        //    I2CBus.Instance.ReadRegister(_slaveConfig, value, x, TransactionTimeout);
+        //    //DisableSensor();
+        //    return x[0];
+        //}
 
         //bool getEvent(sensors_event_t*event)
         //{
@@ -367,63 +365,64 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         //    event->light = calculateLux(full, ir);
 
         //    return true;
-        //}
+        //} 
+        #endregion
 
         #region Trunk
         private enum Registers : byte
         {
-            ENABLE = 0x00,
-            CONTROL = 0x01,
-            THRESHOLD_AILTL = 0x04, // ALS low threshold lower byte
-            THRESHOLD_AILTH = 0x05, // ALS low threshold upper byte
-            THRESHOLD_AIHTL = 0x06, // ALS high threshold lower byte
-            THRESHOLD_AIHTH = 0x07, // ALS high threshold upper byte
-            THRESHOLD_NPAILTL = 0x08, // No Persist ALS low threshold lower byte
-            THRESHOLD_NPAILTH = 0x09, // etc
-            THRESHOLD_NPAIHTL = 0x0A,
-            THRESHOLD_NPAIHTH = 0x0B,
-            PERSIST_FILTER = 0x0C,
-            PACKAGE_PID = 0x11,
-            DEVICE_ID = 0x12,
-            DEVICE_STATUS = 0x13,
-            CHAN0_LOW = 0x14,
-            CHAN0_HIGH = 0x15,
-            CHAN1_LOW = 0x16,
-            CHAN1_HIGH = 0x17
+            Enable = 0x00,
+            Control = 0x01,
+            //THRESHOLD_AILTL = 0x04, // ALS low threshold lower byte
+            //THRESHOLD_AILTH = 0x05, // ALS low threshold upper byte
+            //THRESHOLD_AIHTL = 0x06, // ALS high threshold lower byte
+            //THRESHOLD_AIHTH = 0x07, // ALS high threshold upper byte
+            //THRESHOLD_NPAILTL = 0x08, // No Persist ALS low threshold lower byte
+            //THRESHOLD_NPAILTH = 0x09, // etc
+            //THRESHOLD_NPAIHTL = 0x0A,
+            //THRESHOLD_NPAIHTH = 0x0B,
+            //PERSIST_FILTER = 0x0C,
+            //PACKAGE_PID = 0x11,
+            DeviceId = 0x12,
+            //DEVICE_STATUS = 0x13,
+            Chan0Low = 0x14,
+            //CHAN0_HIGH = 0x15,
+            Chan1Low = 0x16
+            //CHAN1_HIGH = 0x17
         }
 
         private enum Bits : byte
         {
-            READBIT = 0x01,
-            COMMAND_BIT = 0xA0, // 1010 0000: bits 7 and 5 for 'command normal'
-            CLEAR_INT = 0xE7,
-            TEST_INT = 0xE4,
-            WORD_BIT = 0x20,    // 1 = read/write word (rather than byte)
-            BLOCK_BIT = 0x10    // 1 = using block read/write
+            //READBIT = 0x01,
+            CommandBit = 0xA0, // 1010 0000: bits 7 and 5 for 'command normal'
+            //CLEAR_INT = 0xE7,
+            //TEST_INT = 0xE4,
+            WordBit = 0x20    // 1 = read/write word (rather than byte)
+            //BLOCK_BIT = 0x10    // 1 = using block read/write
         }
 
         private enum Enable : byte
         {
-            POWEROFF = 0x00,
-            POWERON = 0x01,
-            AEN = 0x02,    // ALS Enable. This field activates ALS function. Writing a one activates the ALS. Writing a zero disables the ALS.
-            AIEN = 0x10,    // ALS Interrupt Enable. When asserted permits ALS interrupts to be generated, subject to the persist filter.
-            NPIEN = 0x80    // No Persist Interrupt Enable. When asserted NP Threshold conditions will generate an interrupt, bypassing the persist filter
+            Poweroff = 0x00,
+            Poweron = 0x01
+            //AEN = 0x02,    // ALS Enable. This field activates ALS function. Writing a one activates the ALS. Writing a zero disables the ALS.
+            //AIEN = 0x10,    // ALS Interrupt Enable. When asserted permits ALS interrupts to be generated, subject to the persist filter.
+            //NPIEN = 0x80    // No Persist Interrupt Enable. When asserted NP Threshold conditions will generate an interrupt, bypassing the persist filter
         }
 
-        private enum Channels
-        {
-            FULLSPECTRUM = 0,
-            INFRARED = 1, // channel 1
-            VISIBLE = 2 // channel 0 - channel 1
-        }
+        //private enum Channels
+        //{
+        //    FULLSPECTRUM = 0,
+        //    INFRARED = 1, // channel 1
+        //    VISIBLE = 2 // channel 0 - channel 1
+        //}
 
         public enum Gain : byte
         {
-            LOW = 0x00,     // low gain (1x)
-            MED = 0x10,     // medium gain (25x)
-            HIGH = 0x20,    // medium gain (428x)
-            MAX = 0x30      // max gain (9876x)
+            Low = 0x00,     // low gain (1x)
+            Med = 0x10,     // medium gain (25x)
+            High = 0x20,    // medium gain (428x)
+            Max = 0x30      // max gain (9876x)
         }
 
         public enum Integrationtime : byte
@@ -439,8 +438,8 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
         public enum Persistant : byte
         {
             //  bit 7:4: 0
-            _EVERY = 0x00,  // Every ALS cycle generates an interrupt
-            _ANY = 0x01,    // Any value outside of threshold range
+            Every = 0x00,  // Every ALS cycle generates an interrupt
+            Any = 0x01,    // Any value outside of threshold range
             _2 = 0x02,      // 2 consecutive values out of range
             _3 = 0x03,      // 3 consecutive values out of range
             _5 = 0x04,      // 5 consecutive values out of range
@@ -457,10 +456,10 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
             _60 = 0x0F      // 60 consecutive values out of range
         }
 
-        private const float LUX_DF = 408.0F;
-        private const float LUX_COEFB = 1.64F; // CH0 coefficient 
-        private const float LUX_COEFC = 0.59F; // CH1 coefficient A
-        private const float LUX_COEFD = 0.86F; // CH2 coefficient B 
+        private const float LuxDf = 408.0F;
+        private const float LuxCoefb = 1.64F; // CH0 coefficient 
+        private const float LuxCoefc = 0.59F; // CH1 coefficient A
+        private const float LuxCoefd = 0.86F; // CH2 coefficient B 
         #endregion
     }
 }

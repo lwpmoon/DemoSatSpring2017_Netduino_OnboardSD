@@ -34,12 +34,14 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Flight_Computer {
                 _file = fileTest;
                 break;
             }
-            Debug.Print("Logger set up to use file: " + _file);
-            Debug.Print("Creating logger work item...");
+            Debug.Print("[INFO] Logger set up to use file: " + _file);
+            Debug.Print("[INFO] Creating logger work item...");
 
             var unused = new byte[] {};
             _workItem = new WorkItem(LogWorker, ref unused, false, persistent: true);
-           
+
+            Debug.Print("[SUCCESS] Logging initialized.");
+
         }
         
         private void LogWorker() {
@@ -47,6 +49,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Flight_Computer {
             if (PendingItems == 0) return;
             do
             {
+                //Debug.Print("Pending items: " + PendingItems);
                 var packet = (QueuePacket) _pendingData.Dequeue();
                 using (var stream = new FileStream(_file, FileMode.Append))
                 {
@@ -80,15 +83,17 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Flight_Computer {
             FlightComputer.Instance.Execute(_workItem);
             FlightComputer.OnEventTriggered += OnDataFound;
             FlightComputer.Logger = this;
+            Rebug.Print("[SUCCESS] Logging started.");
         }
 
         public void Stop() {
-            Debug.Print("Stopping logger...");
+            Debug.Print("[STOP] Stopping logger...");
             FlightComputer.OnEventTriggered -= OnDataFound;
+            Rebug.Print("[SUCCESS] Logging stopped.");
         }
 
         public void Dispose() {
-            Debug.Print("Disposing of logger...");
+            Debug.Print("[INFO] Disposing of logger...");
             FlightComputer.OnEventTriggered -= OnDataFound;
         }
 
