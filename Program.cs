@@ -71,7 +71,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD {
             MemoryMonitor.Instance.Start(ref logger);
 
             Rebug.Print("[STARTUP] Starting heater updater...");
-            //heater.Start();
+            heater.Start();
 
             ////THIS STARTS THE BNO SENSOR UPDATER
             Rebug.Print("[STARTUP] Starting bno sensor updates...");

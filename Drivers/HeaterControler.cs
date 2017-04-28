@@ -12,8 +12,8 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Drivers
 
         public HeaterControler()
         {
-            _tempSensor = new AnalogInput(Cpu.AnalogChannel.ANALOG_1);
-            _heaterSensor = new AnalogInput(Cpu.AnalogChannel.ANALOG_0);
+            _tempSensor = new AnalogInput(Cpu.AnalogChannel.ANALOG_5);
+            _heaterSensor = new AnalogInput(Cpu.AnalogChannel.ANALOG_3);
             _heaterControlPin = new PWM(PWMChannels.PWM_PIN_D10, 1000, 0, false);
             _heaterControlPin.Start();
         }

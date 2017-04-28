@@ -45,7 +45,7 @@ namespace DemoSatSpring2017Netduino_OnboardSD.Work_Items
             var heaterTemp = _heatercontroler.GetHeaterTemp();
             var temperature = _heatercontroler.GetTemp();
             _heatercontroler.SetHeater(temperature, heaterTemp);
-
+            Rebug.Print("Heater: "+heaterTemp + "  Internal: "+ temperature);
 
             var dataIndex = _metaDataCount;
 
